@@ -11,7 +11,6 @@ const app = express();
 //middle ware
 app.use(express.json());
 app.use(cors());
-app.use(express.static(__dirname+"/public"));
 
 //body-parser
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -31,6 +30,7 @@ mongoose.connect(process.env.DB_URL,
 
 
 //routes
+app.use('/', require('./routes/project'));
 app.get('/', (req, res) =>{
     res.status(200).send({ message:"Welcome at Survey Buddy"});
 });

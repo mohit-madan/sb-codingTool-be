@@ -7,6 +7,8 @@ const projectSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     name: String,
     desc: String, 
+    headerRow: Number,
+    docLink: String,
     listOfQuestion:[{type: mongoose.Schema.Types.ObjectId, ref: 'Question'}],
     CreationDate: Date,
     TotalNumRes: Number,
