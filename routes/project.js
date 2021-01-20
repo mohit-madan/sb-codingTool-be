@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const {uploadFile, deleteFile} = require('../controller/controller.documentFile');
+const {uploadFile, deleteFile, getFile} = require('../controller/controller.documentFile');
 const {createProject, projectDetails} = require('../controller/controller.project');
 
 //upload project document file
 router.post('/uploadFile', uploadFile );
+
+//get project document file
+router.post('/getFile', getFile );
 
 //delete dumy project document file
 router.post('/deleteFile', deleteFile );

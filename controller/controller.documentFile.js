@@ -41,11 +41,24 @@ module.exports ={
                     if(err){
                         res.status('500').send({ message:'Internal server error', type: 'danger'});
                     }else{
-                        res.status('201').send({ message:'doument save successfully', type: 'success', link: data.Location, key: data.Key });    
+                        res.status('201').send({ message:'doument save successfully', type: 'success', key: data.Key });    
                     }
                 });
             }
         });
+    },
+    getFile:(req, res)=>{
+        const key = req.body.key;
+        const params ={
+            Bucket: process.env.AWS_DOCUMENT_BUCKET,
+            Key: key
+        }
+        s3.getObject(params).
+        createReadStream().
+        on('error', function(err){
+              res.status(500).json({error:err});
+        }).
+        pipe(res);
     },
     deleteFile:(req, res)=>{
         const key = req.body.key;

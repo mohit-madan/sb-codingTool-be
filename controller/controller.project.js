@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 
 module.exports ={
     createProject: (req,res)=>{
-        const {name, desc, docLink } = req.body;
+        const {name, desc, key } = req.body;
         const newProject = new Project({
             _id: new mongoose.Types.ObjectId(),
             name: name,
             desc: desc,
-            docLink: docLink
+            docKey: key
         }).save((err, project)=>{
             if(err){
                 res.status('500').send({err:err});
