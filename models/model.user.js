@@ -50,24 +50,25 @@ userSchema.pre('save',  function(next) {
 });
 
 userSchema.pre('findOneAndUpdate',  function(next) {
-    const user = this;
-
-    if (!user.isModified('password')) return next();
-
-    bcrypt.genSalt(10, function(err, salt) {
-        if (err) return next(err);
-
-        bcrypt.hash(user.password, salt, function(err, hash) {
+    const update = this.getUpdate();
+    if (update.password) {
+        bcrypt.genSalt(10, (err, salt) => {
             if (err) return next(err);
-            user.password = hash;
-            return next();
-        });
-    });
+            bcrypt.hash(update.password, salt, (err, hash) => {
+                if (err) return next(err);
+                this.getUpdate().password = hash;
+                next();
+          })
+        })
+      } else {
+        next();
+      }
 });
 
 userSchema.methods.comparePassword = function(password) {
     return bcrypt.compareSync(password,this.password);
 };
+
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 module.exports = User;

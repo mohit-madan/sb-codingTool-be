@@ -4,6 +4,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const passport = require('passport');
+const { authenticateUser } = require('./auth_config/auth');
 
 // create own app
 const app = express();
@@ -11,7 +13,7 @@ const app = express();
 //middle ware
 app.use(express.json());
 app.use(cors());
-
+app.use(express.static(__dirname+"/public"));
 //body-parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -27,12 +29,15 @@ mongoose.connect(process.env.DB_URL,
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 
-
+//Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 //routes
 app.use('/', require('./routes/project'));
-app.get('/', (req, res) =>{
-    res.status(200).send({ message:"Welcome at Survey Buddy"});
+app.use('/', require('./routes/users'));
+app.get('/', authenticateUser, (req, res) =>{
+    res.status(200).send({ message:"Welcome at Survey Buddy",user:req.user});
 });
 
 // define port for app

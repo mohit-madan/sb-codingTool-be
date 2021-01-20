@@ -8,7 +8,7 @@ const projectSchema = new mongoose.Schema({
     name: String,
     desc: String, 
     headerRow: Number,
-    docKey: String,
+    docKey:  { type: String, trim: true , required: true, unique: true },
     listOfQuestion:[{type: mongoose.Schema.Types.ObjectId, ref: 'Question'}],
     CreationDate: Date,
     TotalNumRes: Number,

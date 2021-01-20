@@ -15,14 +15,14 @@ module.exports ={
                 res.status('500').send({err:err});
             }else{
                 //there add project._id to user project list then send back response
-                // User.findByIdAndUpdate(req.user._id { $push: { projects : project._id }},{ upsert: true, new: true }).
-                // exec((err, user)=>{
-                //    if(err){
-                //       res.status('500').send({err:err});
-                //    }else{
+                User.findByIdAndUpdate(req.user._id, { $push: { projects : project._id }},{ upsert: true, new: true }).
+                exec((err, user)=>{
+                   if(err){
+                      res.status('500').send({err:err});
+                   }else{
                       res.status('201').send({message:'Project submit successfully', project:project});
-                //    }
-                // });
+                   }
+                });
             }
         });
     },
