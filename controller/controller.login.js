@@ -2,7 +2,8 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const User = require('../models/model.user');
 const { loginTokenExpiresIn} = require('../constant');
-
+const STATUS_CODE = require('../statusCode')
+const RESPONSE_MESSAGE = require('../responseMessage')
 
 module.exports = {
     login: (req, res) => {
@@ -11,26 +12,26 @@ module.exports = {
             //login with email
             User.findOne({ email: username },async (err, user) => {
                 if (err) {
-                    res.send(err);
+                    res.status(STATUS_CODE.ServerError).send(err);
                 } else {
                     if (!user) {
-                        res.status('404').send({ message: 'User not found' });
+                        res.status(STATUS_CODE.NotFound).send({ message: RESPONSE_MESSAGE.userNotFound });
                     } else {
                         if (!user.password) {
-                            res.status('200').send({ message: 'please reset your password' });
+                            res.status(STATUS_CODE.Ok).send({ message: RESPONSE_MESSAGE.passwordNotFound });
                         }
                         else if (user.verified) {
                             if (user.comparePassword(password)) {
                                 //login
                                 //expires time 15 minutes
                                 const accessToken = await jwt.sign({ username }, process.env.JWT_ACCESS_KEY, { expiresIn: loginTokenExpiresIn });
-                                res.status('200').send({ auth: true, accessToken: accessToken });
+                                res.status(STATUS_CODE.Ok).send({ auth: true, accessToken: accessToken });
                             } else {
-                                res.status('401').send({ message: 'Password incorrect' });
+                                res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.passwordNotMatch });
                             }
 
                         } else {
-                            res.status('401').send({ message: 'Please verify your account.' });
+                            res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.unverifiedUser });
                         }
                     }
                 }
@@ -39,25 +40,25 @@ module.exports = {
             //login with phone number
             User.findOne({ phone: Number(username) },async (err, user) => {
                 if (err) {
-                    res.send(err);
+                    res.status(STATUS_CODE.ServerError).send(err);
                 } else {
                     if (!user) {
-                        res.status('404').send({ message: 'User not found' });
+                        res.status(STATUS_CODE.NotFound).send({ message: RESPONSE_MESSAGE.userNotFound });
                     } else {
                         if (!user.password) {
-                            res.status('200').send({ message: 'please reset your password' });
+                            res.status(STATUS_CODE.Ok).send({ message: RESPONSE_MESSAGE.passwordNotFound });
                         }
                         else if (user.verified) {
                             if (User.comparePassword(password)) {
                                 //login
                                 //expires time 15 minutes
                                 const accessToken = await jwt.sign({ username }, process.env.JWT_ACCESS_KEY, { expiresIn: loginTokenExpiresIn  });
-                                res.status('200').send({ auth: true, accessToken: accessToken });
+                                res.status(STATUS_CODE.Ok).send({ auth: true, accessToken: accessToken });
                             } else {
-                                res.status('401').send({ message: 'Password incorrect' });
+                                res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.passwordNotMatch});
                             }
                         } else {
-                            res.status('401').send({ message: 'Please verify your account.' });
+                            res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.unverifiedUser });
                         }
                     }
                 }

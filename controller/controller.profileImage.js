@@ -1,6 +1,8 @@
 const multer = require('multer');
 const User = require('../models/model.user');
 const path = require('path');
+const STATUS_CODE = require('../statusCode')
+const RESPONSE_MESSAGE = require('../responseMessage')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -18,7 +20,7 @@ const fileFilter = (req, file, cb) => {
     if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png' || file.mimetype == 'image/jpg') {
         cb(null, true)
     } else {
-        return cb(new Error('Only .jpg, .jpeg and .png formate is allowed.',false));
+        return cb(new Error(RESPONSE_MESSAGE.profileImageFormat,false));
     }
 }
 const upload = multer({ storage: storage, fileFilter: fileFilter }).single('image');
@@ -28,20 +30,20 @@ module.exports = {
         upload(req, res, async (err) => {
             if (err) {
                 console.log(err);
-                res.status('400').send({ message: 'Only .jpg, .jpeg and .png formate is allowed.', type: 'danger'});
+                res.status(STATUS_CODE.BadRequest).send({ message: RESPONSE_MESSAGE.profileImageFormat, type: 'danger'});
             } else {
                 try {
                     if(req.user.email){
                         await User.findOneAndUpdate({ email: req.user.email }, { profileLink: req.file.filename });
-                        res.status('201').send({ message: 'Profile Image upload successfully.', type: 'success'});
+                        res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.profileImageUpload, type: 'success'});
                     }else if(req.user.phone){
                         await User.findOneAndUpdate({ phone: Number(req.user.phone) }, { profileLink: req.file.filename });
-                        res.status('201').send({ message: 'Profile Image upload successfully.', type: 'success'});
+                        res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.profileImageUpload, type: 'success'});
                     }else{
-                        res.status('500').send({ message: 'Something went wrong', type: 'danger'});
+                        res.status(STATUS_CODE.ServerError).send({ message: RESPONSE_MESSAGE.internalError, type: 'danger'});
                     }
                 } catch (error) {
-                   res.status('500').send({error: 'Something went wrong'});
+                   res.status(STATUS_CODE.ServerError).send({error: RESPONSE_MESSAGE.internalError, type: 'danger'});
                 }
             }
         });
@@ -51,15 +53,15 @@ module.exports = {
         try {
             if(req.user.email){
                 await User.findOneAndUpdate({ email: req.user.email }, { profileLink: "default.png" });
-                res.status('201').send({ message: 'Profile Image Removed successfully.', type: 'success'});
+                res.status(STATUS_CODE.Delete).send({ message: RESPONSE_MESSAGE.profileImageDelete, type: 'success'});
             }else if(req.user.phone){
                 await User.findOneAndUpdate({ phone: Number(req.user.phone) }, { profileLink: "default.png" });
-                res.status('201').send({ message: 'Profile Image Removed successfully.', type: 'success'});
+                res.status(STATUS_CODE.Delete).send({ message: RESPONSE_MESSAGE.profileImageDelete, type: 'success'});
             }else{
-                res.status('500').send({ message: 'Something went wrong', type: 'danger'});
+                res.status(STATUS_CODE.ServerError).send({error: RESPONSE_MESSAGE.internalError, type: 'danger'});
             }
         } catch (error) {
-            res.status('500').send({error: 'Something went wrong'});
+            res.status(STATUS_CODE.ServerError).send({error: RESPONSE_MESSAGE.internalError, type: 'danger'});
         }
     }
 }

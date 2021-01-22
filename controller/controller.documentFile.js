@@ -1,7 +1,8 @@
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const path = require('path');
-
+const STATUS_CODE = require('../statusCode')
+const RESPONSE_MESSAGE = require('../responseMessage')
 
 const s3 = new AWS.S3({
    accessKeyId: process.env.AWS_ACCESS_ID,
@@ -19,7 +20,7 @@ const fileFilter = (req, file, cb) => {
         file.mimetype == 'application/vnd.ms-excel' || file.mimetype == 'text/csv') {            //.xls || csv
         cb(null, true)
     } else {
-        return cb(new Error('Only .xlsx, .xls and .cvs formate is allowed.'),false);
+        return cb(new Error(RESPONSE_MESSAGE.docFileFormat),false);
     }
 }
 
@@ -29,7 +30,7 @@ module.exports ={
     uploadFile:(req,res)=>{
         upload(req, res, async (err) => {
             if (err) {
-                res.status('400').send({ message: 'Only .xlsx, .xls and .cvs formate is allowed.', type: 'danger'});
+                res.status(STATUS_CODE.BadRequest).send({ error: RESPONSE_MESSAGE.docFileFormat, type: 'danger'});
             } else {
                 // console.log(req.file);
                 const params ={
@@ -39,9 +40,9 @@ module.exports ={
                 }
                 s3.upload(params,(err,data) => {
                     if(err){
-                        res.status('500').send({ message:'Internal server error', type: 'danger'});
+                        res.status(STATUS_CODE.ServerError).send({ message:RESPONSE_MESSAGE.internalError, type: 'danger'});
                     }else{
-                        res.status('201').send({ message:'doument save successfully', type: 'success', key: data.Key });    
+                        res.status(STATUS_CODE.Created).send({ message:RESPONSE_MESSAGE.docFileSave, type: 'success', key: data.Key });    
                     }
                 });
             }
@@ -56,7 +57,7 @@ module.exports ={
         s3.getObject(params).
         createReadStream().
         on('error', function(err){
-              res.status(500).json({error:err});
+              res.json({error:err});
         }).
         pipe(res);
     },
@@ -68,9 +69,9 @@ module.exports ={
         }
         s3.deleteObject(params,(err,data) => {
             if(err){
-                res.status('500').send({ message:'Internal server error', type: 'danger'});
+                res.status(STATUS_CODE.ServerError).send({ message:RESPONSE_MESSAGE.internalError, type: 'danger'});
             }else{
-                res.status('201').send({ message:'doument delete successfully', type: 'success'});    
+                res.status(STATUS_CODE.Delete).send({ message:RESPONSE_MESSAGE.docFileDelete, type: 'success'});    
             }
         });
     }

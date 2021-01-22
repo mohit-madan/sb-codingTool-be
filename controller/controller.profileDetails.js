@@ -1,4 +1,7 @@
 const User = require('../models/model.user');
+const STATUS_CODE = require('../statusCode')
+const RESPONSE_MESSAGE = require('../responseMessage') 
+
 module.exports = {
     saveChanges: (req, res) => {
         const {fname , lname, age, dob, city, state } = req.body;
@@ -13,11 +16,11 @@ module.exports = {
                    'contact.state': state
                  }).exec((err, user)=>{
                      if(err){
-                        res.status('500').send(err);
+                        res.status(STATUS_CODE.ServerError).send(err);
                      }
                      else{
                         req.user = user;
-                        res.status('201').send({ message: 'Profile change save successfully.', type: 'success' });
+                        res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.profileChanged, type: 'success' });
                      }
                  });
             
@@ -31,15 +34,15 @@ module.exports = {
                    'contact.state': state
                  }).exec((err, user)=>{
                      if(err) {
-                        res.status('500').send(err);
+                        res.status(STATUS_CODE.ServerError).send(err);
                      }
                      else{
                         req.user = user;
-                        res.status('201').send({ message: 'Profile change save successfully.', type: 'success' });
+                        res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.profileChanged, type: 'success' });
                      }
                  });
         }else{
-            res.status('500').send({error: 'Something went wrong j'});
+            res.status(STATUS_CODE.ServerError).send({ message: RESPONSE_MESSAGE.internalError});
         }
     }
 }

@@ -11,6 +11,9 @@ const {
     registerEmail_subject,
     registerEmail_text } = require('../constant');
 
+const STATUS_CODE = require('../statusCode')
+const RESPONSE_MESSAGE = require('../responseMessage')
+
 module.exports = {
     //sign up
     registeration: (req, res) => {
@@ -21,7 +24,7 @@ module.exports = {
             //find user already exists or not
             User.findOne({ email: username }, async (err, user) => {
                 if (err) {
-                    res.send(err);
+                    res.status(STATUS_CODE.ServerError).send(err);
                 } else {
                     //new user
                     if (!user) {
@@ -45,17 +48,17 @@ module.exports = {
                         newUser.save((err, user) => {
                             // console.log({user:user});
                             if (err) {
-                                res.send(err);
+                                res.status(STATUS_CODE.ServerError).send(err);
                             } else {
                                 // console.log(Token);
                                 sendEmail(data);
-                                res.status('201').send(user);
+                                res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.userRegistered});
                             }
                         });
 
                     } else {
                         //user is already exists
-                        res.status('409').send({ message: 'User is already exists.' })
+                        res.status(STATUS_CODE.DuplicateData).send({ message: RESPONSE_MESSAGE.userExist })
                     }
                 }
             })
@@ -64,7 +67,7 @@ module.exports = {
             //find user already exists or not
             User.findOne({ phone: username }, (err, user) => {
                 if (err) {
-                    res.send(err);
+                    res.status(STATUS_CODE.ServerError).send(err);
                 } else {
                     //new user
                     if (!user) {
@@ -78,16 +81,16 @@ module.exports = {
                         });
                         newUser.save((err, user) => {
                             if (err) {
-                                res.send(err);
+                                res.status(STATUS_CODE.ServerError).send(err);
                             } else {
                                 // sendOTP(username, phoneOTP);
-                                res.status('201').send(user);
+                                res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.userRegistered });
                             }
                         });
 
                     } else {
                         //user already exists
-                        res.status('409').send({ message: 'User is already exists.' });
+                        res.status(STATUS_CODE.DuplicateData).send({ message: RESPONSE_MESSAGE.userExist  });
                     }
                 }
             })
@@ -100,7 +103,7 @@ module.exports = {
         if (validator.isEmail(username)) {
             User.findOne({ email: username }, (err, user) => {
                 if (err) {
-                    rres.send(err);
+                    res.status(STATUS_CODE.ServerError).send(err);
                 } else {
                     //new user
                     if (!user) {
@@ -111,21 +114,21 @@ module.exports = {
                         });
                         newUser.save((err, user) => {
                             if (err) {
-                                res.send(err);
+                                res.status(STATUS_CODE.ServerError).send(err);
                             } else {
-                                res.status('201').send(user);
+                                res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.userRegistered });
                             }
                         });
                     } else {
                         //user is already exists
-                        res.status('409').send({ message: 'User is already exists.' })
+                        res.status(STATUS_CODE.DuplicateData).send({ message: RESPONSE_MESSAGE.userExist })
                     }
                 }
             })
         } else {
             User.findOne({ phone: username }, (err, user) => {
                 if (err) {
-                    res.send(err);
+                    res.status(STATUS_CODE.ServerError).send(err);
                 } else {
                     //new user
                     if (!user) {
@@ -136,14 +139,14 @@ module.exports = {
                         });
                         newUser.save((err, user) => {
                             if (err) {
-                                res.send(err);
+                                res.status(STATUS_CODE.ServerError).send(err);
                             } else {
-                                res.status('201').send(user);
+                                res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.userRegistered });
                             }
                         });
                     } else {
                         //user already exists
-                        res.status('409').send({ message: 'User is already exists.' });
+                        res.status(STATUS_CODE.DuplicateData).send({ message: RESPONSE_MESSAGE.userExist });
                     }
                 }
             })
