@@ -14,7 +14,8 @@ module.exports ={
             docKey: key
         }).save((err, project)=>{
             if(err){
-                res.status(STATUS_CODE.ServerError).send({err:err});
+                res.status('500').send({err:err});
+                // console.log(err)
             }else{
                 //there add project._id to user project list then send back response
                 User.findByIdAndUpdate(req.user._id, { $push: { projects : project._id }},{ upsert: true, new: true }).

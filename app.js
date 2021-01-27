@@ -10,6 +10,8 @@ const { authenticateUser } = require('./auth_config/auth');
 // create own app
 const app = express();
 
+
+
 //middle ware
 app.use(express.json());
 app.use(cors());
@@ -17,6 +19,29 @@ app.use(express.static(__dirname+"/public"));
 //body-parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+const http = require('http').createServer(app)
+const io = require('socket.io')(http,{
+    cors: {
+      origin: "http://localhost:3000",
+      credentials: true
+    }
+  })
+
+
+io.on('connection', socket => {
+    socket.on('input-box', ({num,value}) => {
+        console.log( {num,value})
+      io.emit('input-box', {num,value})
+    })
+    socket.on('keywords', ({num,value}) => {
+        console.log( {num,value})
+      io.emit('keywords', {num,value})
+    })
+})
+  
+http.listen(4000, function() {
+  console.log('http :== listening on port 4000')
+})
 
 //mongoose connect and set plugins
 mongoose.connect(process.env.DB_URL,
@@ -44,4 +69,4 @@ app.get('/', authenticateUser, (req, res) =>{
 const port = process.env.PORT || 5000;
 
 //config listen
-app.listen(port, () => console.log(`server is running at port: ${port}`));
+// app.listen(port, () => console.log(`server is running at port: ${port}`));
