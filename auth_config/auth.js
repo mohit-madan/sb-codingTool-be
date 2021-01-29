@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
-const User = require('../models/model.user');
+const User = require('../models/user.model');
 const STATUS_CODE = require('../statusCode');
 
 module.exports = {

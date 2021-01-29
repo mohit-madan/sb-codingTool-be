@@ -1,4 +1,4 @@
-const User = require('../models/model.user');
+const User = require('../models/user.model');
 const mongoose = require('mongoose');
 const GoogleStrategy = require('passport-google-oauth20').Strategy; 
 const { domainName } = require('../constant');

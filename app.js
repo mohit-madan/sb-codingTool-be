@@ -26,7 +26,7 @@ mongoose.connect(process.env.DB_URL,
         useCreateIndex: true,
         useFindAndModify: false
      })
-    .then(() => console.log('MongoDB Connected'))
+    .then(() => console.log('Connected to Mongo Database successfully'))
     .catch(err => console.log(err));
 
 //Passport middleware

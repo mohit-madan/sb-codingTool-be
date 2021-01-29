@@ -3,7 +3,7 @@ const { sendEmail } = require('../config/sendEmail');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const User = require('../models/model.user');
+const User = require('../models/user.model');
 const {
     verificationEmailTokenExpiresIn,
     domainName,

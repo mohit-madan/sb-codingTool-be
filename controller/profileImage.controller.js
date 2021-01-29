@@ -1,5 +1,5 @@
 const multer = require('multer');
-const User = require('../models/model.user');
+const User = require('../models/user.model');
 const path = require('path');
 const STATUS_CODE = require('../statusCode')
 const RESPONSE_MESSAGE = require('../responseMessage')

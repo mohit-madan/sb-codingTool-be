@@ -1,6 +1,6 @@
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const User = require('../models/model.user');
+const User = require('../models/user.model');
 const { loginTokenExpiresIn} = require('../constant');
 const STATUS_CODE = require('../statusCode')
 const RESPONSE_MESSAGE = require('../responseMessage')

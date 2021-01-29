@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateUser } = require('../auth_config/auth');
-const {uploadFile, deleteFile, getFile} = require('../controller/controller.documentFile');
-const {createProject, projectDetails} = require('../controller/controller.project');
-
+const {uploadFile, deleteFile, getFile} = require('../controller/documentFile.controller');
+const {createProject, projectDetails} = require('../controller/project.controller');
+const {getResponse} = require('../controller/response.controller');
 //upload project document file
 router.post('/uploadFile', authenticateUser, uploadFile );
 
@@ -18,5 +18,8 @@ router.post('/createProject', authenticateUser, createProject);
 
 //get details of project
 router.post('/projectDetails', authenticateUser, projectDetails);
+
+//getResponse in pagination
+router.get('/response/:pageNumber/:limit', authenticateUser, getResponse);
 
 module.exports = router;

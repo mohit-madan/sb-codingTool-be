@@ -1,7 +1,7 @@
 const domainName = 'http://localhost:5000';
 const frontendUrl = 'http://localhost:3000'
 // expired time of token 
-const loginTokenExpiresIn = '900s'; // 15 minutes
+const loginTokenExpiresIn = '1800s'; // 15 minutes
 const verificationEmailTokenExpiresIn = '600s'; // 10 minutes
 const resetPasswordTokenExpiresIn = '300s'; // 5 minutes
 

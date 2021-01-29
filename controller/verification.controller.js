@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { frontendUrl } = require('../constant');
-const User = require('../models/model.user');
+const User = require('../models/user.model');
 const STATUS_CODE = require('../statusCode');
 
 module.exports ={

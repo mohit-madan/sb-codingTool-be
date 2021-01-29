@@ -3,12 +3,12 @@ const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { authenticateUser } = require('../auth_config/auth');
-const { login } = require('../controller/controller.login');
-const { forgetPass, resetPassWithEmail, resetPassWithPhone} = require('../controller/controller.password');
-const { confirmAccount, verifyToken} = require('../controller/controller.verification');
-const { registeration, registerWithoutPass } = require('../controller/controller.signup');
-const { imageUpload, imageRemove } = require('../controller/controller.profileImage');
-const { saveChanges } = require('../controller/controller.profileDetails');
+const { login } = require('../controller/login.controller');
+const { forgetPass, resetPassWithEmail, resetPassWithPhone} = require('../controller/password.controller');
+const { confirmAccount, verifyToken} = require('../controller/verification.controller');
+const { registeration, registerWithoutPass } = require('../controller/signup.controller');
+const { imageUpload, imageRemove } = require('../controller/profileImage.controller');
+const { saveChanges } = require('../controller/profileDetails.controller');
 require('../auth_config/google-auth')(passport);
 
 
@@ -16,7 +16,7 @@ require('../auth_config/google-auth')(passport);
 router.post('/register', registeration)
 
 //user login 
-router.post('/login',  login);
+router.post('/login', login);
 
 //register without password
 router.post('/registerWithoutPass', registerWithoutPass);
