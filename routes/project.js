@@ -3,7 +3,7 @@ const router = express.Router();
 const { authenticateUser } = require('../auth_config/auth');
 const {uploadFile, deleteFile, getFile} = require('../controller/documentFile.controller');
 const {createProject, projectDetails} = require('../controller/project.controller');
-const {getResponse} = require('../controller/response.controller');
+const {getResponse, searchByCodeWord, sortByLength} = require('../controller/response.controller');
 //upload project document file
 router.post('/uploadFile', authenticateUser, uploadFile );
 
@@ -21,5 +21,12 @@ router.post('/projectDetails', authenticateUser, projectDetails);
 
 //getResponse in pagination
 router.get('/response/:pageNumber/:limit', authenticateUser, getResponse);
+
+//sort by code word length
+router.get('/sort/:min/:max', authenticateUser, sortByLength);
+
+//search by given pattern
+router.get('/search/:pattern', authenticateUser, searchByCodeWord);
+
 
 module.exports = router;

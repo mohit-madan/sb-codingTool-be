@@ -14,43 +14,43 @@ const projectSchema = `CREATE TABLE IF NOT EXISTS projects (
     header_row INT DEFAULT 1,
     doc_key VARCHAR(255) NOT NULL,
     creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    lang VARCHAR(100),
+    lang VARCHAR(100) DEFAULT 'English',
     created_by VARCHAR(24),
     assigned_to VARCHAR(24),
-    question_id INT,
     total_responses INT,
-    codebook_id INT,
-    PRIMARY KEY(id),
-    FOREIGN KEY(question_id) REFERENCES questions(id),
-    FOREIGN KEY(codebook_id) REFERENCES codebooks(id)
+    PRIMARY KEY(id)
     )`;
  
 const questionSchema = `CREATE TABLE IF NOT EXISTS questions (
     id INT AUTO_INCREMENT,
     description TEXT NOT NULL,
     percentage_of_coded FLOAT,
-    codebook_id INT,
-    response_id INT,
+    project_id INT,
     PRIMARY KEY(id),
-    FOREIGN KEY(codebook_id) REFERENCES codebooks(id),
-    FoREIGN KEY(response_id) REFERENCES responses(id)
+    FOREIGN KEY(project_id) REFERENCES projects(id)
     )`;
 
 const responseSchema = `CREATE TABLE IF NOT EXISTS responses (
    id INT AUTO_INCREMENT,
    description VARCHAR(255) NOT NULL,
    translated_desc VARCHAR(255) NOT NULL,
-   lang VARCHAR(100) DEFAULT 'en',
-   codebook_id INT,
+   lang VARCHAR(100) DEFAULT 'English',
+   question_id INT,
    PRIMARY KEY(id),
-   FOREIGN KEY(codebook_id) REFERENCES codebooks(id)
+   FOREIGN KEY(question_id) REFERENCES questions(id)
    )`;  
  
 const codebookSchema = `CREATE TABLE IF NOT EXISTS codebooks (
    id INT AUTO_INCREMENT,
    code_word VARCHAR(100),
    length INT NOT NULL,
-   PRIMARY KEY(id)
+   project_id INT,
+   question_id INT,
+   response_id INT,
+   PRIMARY KEY(id),
+   FOREIGN KEY(project_id) REFERENCES projects(id),
+   FOREIGN KEY(question_id) REFERENCES questions(id),
+   FOREIGN KEY(response_id) REFERENCES responses(id)
    )`;   
 
 const db = mysql.createConnection(mysqlConnection);
@@ -60,25 +60,29 @@ db.connect((err) => {
     else
         console.log('Connected to MySQL Database successfully');
         //CodebooksSchema
-        db.query(codebookSchema, (err, result)=>{
-            if(err) console.log(`Error during create Codebooks table: ${err}`);
-            // else console.log('Codebooks table is created successfully');
-        });
-        //ResponsesSchema
-        db.query(responseSchema, (err, result)=>{
-            if(err) console.log(`Error during create Responses table: ${err}`);
-            // else console.log('Responses table is created successfully');
+        //projectSchema
+        db.query(projectSchema, (err, result)=>{
+            if(err) console.log(`Error during create Projects table: ${err}`);
+            // else console.log('Projects table is created successfully');
         });
         //QuestionsSchema
         db.query(questionSchema, (err, result)=>{
             if(err) console.log(`Error during create Questions table: ${err}`);
             // else console.log('Questions table is created successfully');
         });
-        //projectSchema
-        db.query(projectSchema, (err, result)=>{
-            if(err) console.log(`Error during create Projects table: ${err}`);
-            // else console.log('Projects table is created successfully');
+        //ResponsesSchema
+        db.query(responseSchema, (err, result)=>{
+            if(err) console.log(`Error during create Responses table: ${err}`);
+            // else console.log('Responses table is created successfully');
         });
+        db.query(codebookSchema, (err, result)=>{
+            if(err) console.log(`Error during create Codebooks table: ${err}`);
+            // else console.log('Codebooks table is created successfully');
+        });
+        
+        
+        
+
 });
 
 module.exports = db;

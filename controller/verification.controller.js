@@ -18,7 +18,7 @@ module.exports ={
                     if(err) {
                         res.status(STATUS_CODE.ServerError).send({err:err});
                     }else {
-                        res.status(STATUS_CODE.Ok).sendredirect(`${frontendUrl}/login`);
+                        res.status(STATUS_CODE.Ok).redirect(`${frontendUrl}/login`);
                     }
                 })
             }
