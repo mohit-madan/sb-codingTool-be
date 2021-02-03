@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const { authenticateUser } = require('./auth_config/auth');
 
+
+
 // create own app
 const app = express();
 

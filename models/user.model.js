@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const {UserRole} = require('./userRole.model');
-
+const {Project} = require('./project.model');
 const userSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     googleId: String, 
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     lang:[{ type: String }],
     otp: Number,
     userRoles:{type: mongoose.Schema.Types.ObjectId, ref: 'UserRole'},
-    projects:[{type:Number}]
+    projects:[{type: mongoose.Schema.Types.ObjectId, ref: 'Project'}]
 });
 
 userSchema.pre('save',  function(next) {

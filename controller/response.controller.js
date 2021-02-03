@@ -1,59 +1,94 @@
-const db = require('../mysql/mysqlDB');
-const STATUS_CODE = require('../statusCode')
+const STATUS_CODE = require('../statusCode');
+const Project = require('../models/project.model');
+const Question = require('../models/question.model');
+const Response = require('../models/response.model');
+const Codebook = require('../models/codebook.model');
+const {cacheTime} = require('../constant');
+//initialize cache
+const REDIS_PORT = process.env.PORT || 6379 ;
+const redis = require('redis');
+const client = redis.createClient(REDIS_PORT);
+client.on('error', err => console.error(err));
+
+
 
 module.exports = {
     getResponse: (req, res)=>{
+        const id = req.body.projectId;
         const questionId = req.body.questionId;
         const {pageNumber, limit} = req.params;
-        const totalResponse = 0;
         if(pageNumber==undefined) pageNumber = 1;
         if(limit==undefined) limit = 10;
-
-        const countQuery = `SELECT COUNT(responses.id) as total FROM  responses INNER JOIN questions WHERE questions_id=${questionId}`;
-        db.query(countQuery, (err, result)=>{
+        const start = (pageNumber-1)*limit;
+        client.get(`${id}`,async (err, data) =>{
             if(err){
-                res.status(STATUS_CODE.ServerError).send({err:err});
+                res.send({err});
             }else{
-                totalResponse = result[0].total;
+                if(data){
+                    console.log("fetch data from cache");
+                    res.send(JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.slice(start, start+limit));
+                }else{
+                    console.log("load data from database");
+                    await Project.findById(id).
+                        populate({ path: 'listOfQuestion', model: Question,
+                        populate:[
+                            {
+                                path: 'listOfResponses', 
+                                model:Response,
+                                populate:{path: 'codebook', model: Codebook}
+                            },
+                            {
+                                path:"codebook",
+                                model:Codebook
+                            }
+                            ]
+                        }).exec((err, data) => {
+                            if(err){
+                                res.send({err:err});
+                            }else{
+                                console.log("load data from database : " + data);
+                                client.setex(`${id}`,cacheTime, JSON.stringify(data));
+                                res.send(data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.slice(start, start+limit));
+                            }
+                    }); 
+                }
             }
-        });
-        const totalNumOfPage = Math.ceil(totalResponse/limit);
-        const offset = limit*(pageNumber-1);
-        const queryString = `SELECT responses.description FROM responses INNER JOIN questions WHERE questions_id=${questionId}  LIMIT ${limit} OFFSET ${offset}`;
-        db.query(queryString, (err, result)=>{
-            if(err){
-                res.status(STATUS_CODE.ServerError).send({err:err});
-            }else{
-                res.status(STATUS_CODE.Ok).send({ project:result, totalNumOfPage, currentPage: pageNumber, limit: limit});
-            }
-        });  
+        }) 
     },
-    //need pagination ???
     sortByLength:(req, res)=> {
+        const id = req.body.projectId;
         const questionId = req.body.questionId;
         const {min, max} = req.params;
         if(min === undefined || min < 0) min = 0;
         if(max === undefined || max > 2147483647) max = 2147483647;
-        const queryString = `SELECT code_word FROM codebooks WHERE question_id=${questionId} AND length BETWEEN ${min} AND ${max}`;
-        db.query(queryString, (err, result)=>{
+        client.get(`${id}`, async (err, data) => {
             if(err){
-                res.status(STATUS_CODE.ServerError).send({err:err});
+                res.send({err});
             }else{
-                res.status(STATUS_CODE.Ok).send({ result:result});
+                if(data){
+                    console.log("fetch data from cache");
+                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.codebook.length>=min && ele.codebook.length<=max);
+                    res.send(sortData);
+                }
             }
-        }); 
+
+        })
     },
-    //need pagination ???
     searchByCodeWord:(req, res)=>{
+        const id = req.body.projectId;
         const questionId = req.body.questionId;
         const pattern = req.params.pattern; 
-        const queryString = `SELECT code_word FROM codebooks WHERE question_id=${questionId} AND code_word LIKE '%${pattern}%' ORDER BY code_word ASC`;
-        db.query(queryString, (err, result)=>{
+        client.get(`${id}`, async (err, data) => {
             if(err){
-                res.status(STATUS_CODE.ServerError).send({err:err});
+                res.send({err});
             }else{
-                res.status(STATUS_CODE.Ok).send({ result:result});
+                if(data){
+                    console.log("fetch data from cache");
+                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.codebook.codeword.includes(pattern));
+                    res.send(sortData);
+                }
             }
-        }); 
+        })
+        
     }
 }
