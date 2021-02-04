@@ -13,6 +13,7 @@ client.on('error', err => console.error(err));
 
 
 module.exports = {
+
     getResponse: (req, res)=>{
         const id = req.body.projectId;
         const questionId = req.body.questionId;
@@ -55,6 +56,8 @@ module.exports = {
             }
         }) 
     },
+
+
     sortByLength:(req, res)=> {
         const id = req.body.projectId;
         const questionId = req.body.questionId;
@@ -69,11 +72,37 @@ module.exports = {
                     console.log("fetch data from cache");
                     const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.codebook.length>=min && ele.codebook.length<=max);
                     res.send(sortData);
+                }else{
+                    console.log("load data from database");
+                    await Project.findById(id).
+                        populate({ path: 'listOfQuestion', model: Question,
+                        populate:[
+                            {
+                                path: 'listOfResponses', 
+                                model:Response,
+                                populate:{path: 'codebook', model: Codebook}
+                            },
+                            {
+                                path:"codebook",
+                                model:Codebook
+                            }
+                            ]
+                        }).exec((err, data) => {
+                            if(err){
+                                res.send({err:err});
+                            }else{
+                                console.log("load data from database : " + data);
+                                client.setex(`${id}`,cacheTime, JSON.stringify(data));
+                                res.send(data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.codebook.length>=min && ele.codebook.length<=max));
+                            }
+                    }); 
                 }
             }
 
         })
     },
+
+
     searchByCodeWord:(req, res)=>{
         const id = req.body.projectId;
         const questionId = req.body.questionId;
@@ -84,11 +113,35 @@ module.exports = {
             }else{
                 if(data){
                     console.log("fetch data from cache");
-                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.codebook.codeword.includes(pattern));
+                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>!ele.codebook.codeword.search(new RegExp(pattern, "i")));
                     res.send(sortData);
+                }else{
+                    console.log("load data from database");
+                    await Project.findById(id).
+                        populate({ path: 'listOfQuestion', model: Question,
+                        populate:[
+                            {
+                                path: 'listOfResponses', 
+                                model:Response,
+                                populate:{path: 'codebook', model: Codebook}
+                            },
+                            {
+                                path:"codebook",
+                                model:Codebook
+                            }
+                            ]
+                        }).exec((err, data) => {
+                            if(err){
+                                res.send({err:err});
+                            }else{
+                                console.log("load data from database : " + data);
+                                client.setex(`${id}`,cacheTime, JSON.stringify(data));
+                                res.send(data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>!ele.codebook.codeword.search(new RegExp(pattern, "i"))));
+                            }
+                    }); 
                 }
             }
-        })
-        
+        })   
     }
+
 }
