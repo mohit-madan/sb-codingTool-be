@@ -1,11 +1,9 @@
 const mongoose = require('mongoose');
+const {Codeword} = require('./codeword.model');
 
 const codebookSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
-    projectId: mongoose.Types.ObjectId,
-    questionId: mongoose.Types.ObjectId,
-    codeword: String,
-    length: Number,
+    codewords:[{type: mongoose.Schema.Types.ObjectId, ref: 'Codeword'}] 
 });
 
 

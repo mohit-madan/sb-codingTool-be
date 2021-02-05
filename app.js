@@ -7,10 +7,35 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const { authenticateUser } = require('./auth_config/auth');
 
-
-
 // create own app
 const app = express();
+const server = require('http').createServer(app);
+//set up socket.io
+const socketio = require('socket.io');
+const io = socketio(server);
+
+io.on('connection', socket=>{
+    
+    socket.join('join', ({username, room})=>{
+         socket.join(room);
+         // simple emit a message
+         socket.emit('message', 'Welcome to Survey Buddy'); // emit to single user who is connecting
+
+        //new user is connected
+         socket.broadcast.to(room).emit('message', `New ${username} is connected`);// emit to all users except to connected user
+    })
+    
+
+    //user disconnected
+    socket.on('disconnect', ()=>{
+        io.emit('message', 'User is disconnected');           // emit to all users
+    })
+
+    //do some opretion
+    socket.on('opretion', opretion=>{
+        io.emit('message', opretion)
+    })
+})
 
 //middle ware
 app.use(express.json());
@@ -46,4 +71,4 @@ app.get('/', authenticateUser, (req, res) =>{
 const port = process.env.PORT || 5000;
 
 //config listen
-app.listen(port, () => console.log(`server is running at port: ${port}`));
+server.listen(port, () => console.log(`server is running at port: ${port}`));

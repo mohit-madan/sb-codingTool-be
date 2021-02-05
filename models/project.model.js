@@ -11,11 +11,12 @@ const projectSchema = new mongoose.Schema({
     docKey:  { type: String, trim: true , required: true, unique: true },
     listOfQuestion:[{type: mongoose.Schema.Types.ObjectId, ref: 'Question'}],
     CreationDate: Date,
+    TotalNumOfRes: Number,
     CreatedBy:{type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     assignedTo:[{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     lang: {type: String, Default: 'English'},
-    //main codebook universal set of project (array of all codebook objects)
-    codebook:[{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'}]
+    //array of codebook of question in the project 
+    codebooks:[{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'}]
 });
 
 

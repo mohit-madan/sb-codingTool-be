@@ -48,6 +48,7 @@ module.exports ={
             }
         });
     },
+
     getFile:(req, res)=>{
         const key = req.body.key;
         const params ={
@@ -61,6 +62,7 @@ module.exports ={
         }).
         pipe(res);
     },
+    
     deleteFile:(req, res)=>{
         const key = req.body.key;
         const params ={

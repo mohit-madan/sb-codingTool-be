@@ -2,7 +2,7 @@ const STATUS_CODE = require('../statusCode');
 const Project = require('../models/project.model');
 const Question = require('../models/question.model');
 const Response = require('../models/response.model');
-const Codebook = require('../models/codebook.model');
+const Codeword = require('../models/codeword.model');
 const {cacheTime} = require('../constant');
 //initialize cache
 const REDIS_PORT = process.env.PORT || 6379 ;
@@ -27,29 +27,27 @@ module.exports = {
             }else{
                 if(data){
                     console.log("fetch data from cache");
-                    res.send(JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.slice(start, start+limit));
+                    const result = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.slice(start, Number(start)+Number(limit))
+                    res.send(result.map(({resNum, desc, length, codewords})=>({resNum, desc, length, codewords})));
                 }else{
                     console.log("load data from database");
                     await Project.findById(id).
                         populate({ path: 'listOfQuestion', model: Question,
-                        populate:[
+                        populate:
                             {
                                 path: 'listOfResponses', 
                                 model:Response,
-                                populate:{path: 'codebook', model: Codebook}
-                            },
-                            {
-                                path:"codebook",
-                                model:Codebook
+                                options: { sort: { 'resNum': 'asc' }},
+                                populate:{path: 'codewords', model: Codeword}
                             }
-                            ]
-                        }).exec((err, data) => {
+                        }).exec(async(err, data) => {
                             if(err){
                                 res.send({err:err});
                             }else{
                                 console.log("load data from database : " + data);
                                 client.setex(`${id}`,cacheTime, JSON.stringify(data));
-                                res.send(data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.slice(start, start+limit));
+                                const result = await data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.slice(start, Number(start)+Number(limit));
+                                res.send(result.map(({resNum, desc, length, codewords})=>({resNum, desc, length, codewords})));
                             }
                     }); 
                 }
@@ -70,30 +68,27 @@ module.exports = {
             }else{
                 if(data){
                     console.log("fetch data from cache");
-                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.codebook.length>=min && ele.codebook.length<=max);
-                    res.send(sortData);
+                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.length>=min && ele.length<=max);
+                    res.send(sortData.map(({resNum, desc, length, codewords})=>({resNum, desc, length, codewords})))
                 }else{
                     console.log("load data from database");
                     await Project.findById(id).
                         populate({ path: 'listOfQuestion', model: Question,
-                        populate:[
+                        populate:
                             {
                                 path: 'listOfResponses', 
                                 model:Response,
-                                populate:{path: 'codebook', model: Codebook}
-                            },
-                            {
-                                path:"codebook",
-                                model:Codebook
+                                options: { sort: { 'resNum': 'asc' }},
+                                populate:{path: 'codewords', model: Codeword}
                             }
-                            ]
                         }).exec((err, data) => {
                             if(err){
                                 res.send({err:err});
                             }else{
                                 console.log("load data from database : " + data);
                                 client.setex(`${id}`,cacheTime, JSON.stringify(data));
-                                res.send(data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.codebook.length>=min && ele.codebook.length<=max));
+                                res.send(data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.length>=min && ele.length<=max));
+                                res.send(sortData.map(({resNum, desc, length, codewords})=>({resNum, desc, length, codewords})))
                             }
                     }); 
                 }
@@ -102,8 +97,66 @@ module.exports = {
         })
     },
 
+    searchByResponse:(req, res)=>{
+        const id = req.body.projectId;
+        const questionId = req.body.questionId;
+        var pattern = req.params.pattern; 
+        client.get(`${id}`, async (err, data) => {
+            if(err){
+                res.send({err});
+            }else{
+                if(data){
+                    console.log("fetch data from cache");
+                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(({resNum, desc, length, codewords})=>{
+                        pattern = pattern.toLowerCase();
+                        if(desc.toLowerCase().indexOf(pattern) != -1){
+                            return true;
+                        }else return false;
+                    }).map(({resNum, desc, length, codewords, fIndex, lIndex})=>{
+                        pattern = pattern.toLowerCase();
+                        fIndex = desc.toLowerCase().indexOf(pattern);
+                        lIndex = fIndex + pattern.length-1;
+                        return {resNum, desc, length, codewords, fIndex, lIndex};
+                    })
+                    res.send(sortData)
+                }else{
+                    console.log("load data from database");
+                    await Project.findById(id).
+                        populate({ path: 'listOfQuestion', model: Question,
+                        populate:
+                            {
+                                path: 'listOfResponses', 
+                                model:Response,
+                                options: { sort: { 'resNum': 'asc' }},
+                                populate:{path: 'codewords', model: Codeword}
+                            }
+                        }).exec(async(err, data) => {
+                            if(err){
+                                res.send({err:err});
+                            }else{
+                                console.log("load data from database : " + data);
+                                client.setex(`${id}`,cacheTime, JSON.stringify(data));
+                                const sortData = await data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(({resNum, desc, length, codewords})=>{
+                                    pattern = pattern.toLowerCase();
+                                    if(desc.toLowerCase().indexOf(pattern) != -1){
+                                        return true;
+                                    }else return false;
+                                }).map(({resNum, desc, length, codewords, fIndex, lIndex})=>{
+                                    pattern = pattern.toLowerCase();
+                                    fIndex = desc.toLowerCase().indexOf(pattern);
+                                    lIndex = fIndex + pattern.length-1;
+                                    return {resNum, desc, length, codewords, fIndex, lIndex};
+                                })
+                                res.send(sortData)
+                            }
+                    }); 
+                }
+            }
+        })   
+    },
 
-    searchByCodeWord:(req, res)=>{
+    
+    searchByExactResponse:(req, res)=>{
         const id = req.body.projectId;
         const questionId = req.body.questionId;
         const pattern = req.params.pattern; 
@@ -113,30 +166,41 @@ module.exports = {
             }else{
                 if(data){
                     console.log("fetch data from cache");
-                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>!ele.codebook.codeword.search(new RegExp(pattern, "i")));
-                    res.send(sortData);
+                    const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(({resNum, desc, length, codewords})=>{
+                        var regExp = new RegExp("^" + pattern + "$", 'i'); 
+                        if(desc.search(regExp)!=-1){
+                            return true;
+                        }else return false;
+                    }).map(({resNum, desc, length, codewords})=>{
+                        return {resNum, desc, length, codewords};
+                    })
+                    res.send(sortData)
                 }else{
                     console.log("load data from database");
                     await Project.findById(id).
                         populate({ path: 'listOfQuestion', model: Question,
-                        populate:[
+                        populate:
                             {
                                 path: 'listOfResponses', 
                                 model:Response,
-                                populate:{path: 'codebook', model: Codebook}
-                            },
-                            {
-                                path:"codebook",
-                                model:Codebook
+                                options: { sort: { 'resNum': 'asc' }},
+                                populate:{path: 'codewords', model: Codeword}
                             }
-                            ]
-                        }).exec((err, data) => {
+                        }).exec(async(err, data) => {
                             if(err){
                                 res.send({err:err});
                             }else{
                                 console.log("load data from database : " + data);
                                 client.setex(`${id}`,cacheTime, JSON.stringify(data));
-                                res.send(data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>!ele.codebook.codeword.search(new RegExp(pattern, "i"))));
+                                const sortData = data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(({resNum, desc, length, codewords})=>{
+                                    var regExp = new RegExp("^" + pattern + "$", 'i'); 
+                                    if(desc.search(regExp)!=-1){
+                                        return true;
+                                    }else return false;
+                                }).map(({resNum, desc, length, codewords})=>{
+                                    return {resNum, desc, length, codewords};
+                                })
+                                res.send(sortData)
                             }
                     }); 
                 }
