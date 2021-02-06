@@ -13,12 +13,15 @@ const s3 = new AWS.S3({
 
 module.exports ={
     createProject: (req,res)=>{
-        const {name, desc, key } = req.body;
+        const {name, desc, key, coloumns, industry, type, tags} = req.body;
         const newProject = new Project({
             _id: new mongoose.Types.ObjectId(),
             name: name,
             desc: desc,
-            docKey: key
+            docKey: key,
+           industry: industry,
+           type: type,
+           tags: tags,
         }).save((err, project)=>{
             if(err){
                 res.status(STATUS_CODE.ServerError).send({err:err});
@@ -41,41 +44,53 @@ module.exports ={
                                     res.send({err});
                                 }else{
                                     const data = result.Body.toString("utf8").split('\r\n');
-                                    const newQuestion = new Question({
-                                        _id: new mongoose.Types.ObjectId(),
-                                        desc: data[0],
-                                    }).save(async (err, question) => {
-                                        Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion : question._id }},{ upsert: true, new: true }).
-                                        exec((err, project)=>{
-                                        if(err){
-                                            return res.send({err:err});
-                                        }else{
-                                            let i = 1;
-                                            for( i ; i <data.length-1;i++){
-                                                const newResponse = new Response({
-                                                    _id: new mongoose.Types.ObjectId(),
-                                                    resNum: i,
-                                                    desc: data[i],
-                                                    length: data[i].length,
-                                                    questionId : question._id
-                                                }).save((err, response) => {
+                                    let row = [];
+                                    await coloumns.map(ele=>{
+                                        const newQuestion = new Question({
+                                            _id: new mongoose.Types.ObjectId(),
+                                             desc: ele.question,
+                                        }).save((err, question)=>{
+                                            if(err){
+                                                return res.send({err:err});
+                                            }else{
+                                                Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion : question._id }},{ upsert: true, new: true }).
+                                                exec((err, project)=>{
                                                     if(err){
-                                                        res.send({err});
+                                                        return res.send({err:err});
                                                     }else{
-                                                        Question.findByIdAndUpdate(question._id, { $push: { listOfResponses : response._id }},{ upsert: true, new: true }).
-                                                        exec((err,result)=>{
-                                                            if(err) {return res.send({err:err})}
-                                                        });
+                                                        let resNum = 0;
+                                                        for(let i =1; i < data.length; i++){
+                                                            row = data[i].split(',');
+                                                            if( row[ele.coloumn] === undefined ||  row[ele.coloumn] =='' || row[ele.coloumn]=='\r\n'){
+                                                                console.log(' ');
+                                                            }else{
+                                                                resNum++;
+                                                                const newResponse = new Response({
+                                                                    _id: new mongoose.Types.ObjectId(),
+                                                                    resNum: resNum,
+                                                                    desc: row[ele.coloumn],
+                                                                    length: String(row[ele.coloumn]).length,
+                                                                    questionId : question._id
+                                                                }).save((err, response) => {
+                                                                if(err){
+                                                                    res.send({err});
+                                                                }else{
+                                                                    Question.findByIdAndUpdate(question._id, { $push: { listOfResponses : response._id }},{ upsert: true, new: true }).
+                                                                    exec((err,result)=>{
+                                                                        if(err) {return res.send({err:err})}
+                                                                    });
+                                                                }
+                                                                }) 
+                                                            }
+                                                        }
                                                     }
-                                                })
+                                                });
                                             }
-                                            if(i == data.length-1){
-                                                res.status(STATUS_CODE.Created).send({message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
-                                            }
-                                        }
-                                    });
+                                        });
+
                                     })
-                                }
+                                    res.status(STATUS_CODE.Created).send({message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
+                                }//eles body finish
                             })
                         }else{
                             res.send({message: 'only .csv file logic implement'});

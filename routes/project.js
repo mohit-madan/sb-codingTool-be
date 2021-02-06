@@ -21,7 +21,7 @@ router.post('/createProject', authenticateUser, createProject);
 router.post('/projectDetails', authenticateUser, projectDetails);
 
 // getResponse in pagination
-router.get('/response/:pageNumber/:limit', getResponse);
+router.post('/response/:pageNumber/:limit', getResponse);
 
 // sort by code word length
 router.get('/sort/:min/:max', sortByLength);
