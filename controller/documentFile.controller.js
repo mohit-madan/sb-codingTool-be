@@ -51,16 +51,30 @@ module.exports ={
 
     getFile:(req, res)=>{
         const key = req.body.key;
+        // const params ={
+        //     Bucket: process.env.AWS_DOCUMENT_BUCKET,
+        //     Key: key
+        // }
+        // s3.getObject(params).
+        // createReadStream().
+        // on('error', function(err){
+        //       res.json({error:err});
+        // }).
+        // pipe(res);
+
         const params ={
             Bucket: process.env.AWS_DOCUMENT_BUCKET,
             Key: key
         }
-        s3.getObject(params).
-        createReadStream().
-        on('error', function(err){
-              res.json({error:err});
-        }).
-        pipe(res);
+        s3.getObject(params, async(err,result) => {
+            if(err){
+                res.send({err});
+            }else{
+                const data = result.Body.toString("utf8").split('\r\n');
+                console.log(data);
+                res.send({data})
+            }
+        })
     },
     
     deleteFile:(req, res)=>{

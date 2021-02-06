@@ -31,7 +31,7 @@ module.exports ={
                     }else{
                         //here fetch data from document file (question, [respones]) and store to database
                         const formate = key.split('.');
-                        if(data[data.length - 1] === 'csv'){
+                        if(formate[formate.length - 1] === 'csv'){
                             const params ={
                                 Bucket: process.env.AWS_DOCUMENT_BUCKET,
                                 Key: key
