@@ -3,7 +3,7 @@ const Project = require('../models/project.model');
 const Question = require('../models/question.model');
 const Response = require('../models/response.model');
 const Codeword = require('../models/codeword.model');
-const {cacheTime} = require('../constant');
+const {cacheTimeFullProject, cacheTimeForFilter} = require('../constant');
 //initialize cache
 const REDIS_PORT = process.env.PORT || 6379 ;
 const redis = require('redis');
@@ -28,7 +28,7 @@ function DESC( a, b ) {
 
 const fiterByLengthAscOrder = async(questionId, result)=>{
         const data = await result.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.sort((a, b) => parseFloat(a.length) -parseFloat(b.length));
-        return data.map(({resNum, desc, length, codewords})=>({resNum, desc, length, codewords}));
+        return data.map(({resNum, desc, length, codewords,  fIndex, lIndex})=>({resNum, desc, length, codewords, fIndex, lIndex}));
 }
 
 const fiterByLengthDescOrder = async(questionId, result)=>{
@@ -76,16 +76,31 @@ const fiterByResponseOnCodewordMatch = async(questionId, codeword, result)=>{
     var regExp = new RegExp("^" + codeword + "$", 'i'); 
        if(codewords.length>0){
         codewords.map(it=>{
-            if( it.tag.search(regExp)!=-1) return true;
+            if( it.tag.search(regExp)!=-1) return true; //match return true
         })
        }
-       return false;
+       return false; // return false codewodrs empty
     }).map(({resNum, desc, length, codewords})=>{
        return {resNum, desc, length, codewords};
     })
 }
 
-const fiterByResponseWhichHaveNotAnyCodeword = async(questionId, codeword, result)=>{
+const fiterByResponseOnCodewordDisMatch = async(questionId, codeword, result)=>{
+    return result.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(({resNum, desc, length, codewords})=>{
+    var regExp = new RegExp("^" + codeword + "$", 'i'); 
+       if(codewords.length>0){ 
+        codewords.map(it=>{
+            if( it.tag.search(regExp)!=-1) return false; //match return false
+        })
+        return true; //given codeword not exists in all codewords return true
+       }
+       return false; // return false codewodrs empty
+    }).map(({resNum, desc, length, codewords})=>{
+       return {resNum, desc, length, codewords};
+    })
+}
+
+const fiterByResponseWhichHaveNotAnyCodeword = async(questionId, result)=>{
     return result.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(({resNum, desc, length, codewords})=>{
         if(codewords.length===0){
             return true
@@ -132,7 +147,7 @@ module.exports = {
                                 res.send({err:err});
                             }else{
                                 console.log("load data from database : " + data);
-                                client.setex(`${id}`,cacheTime, JSON.stringify(data));
+                                client.setex(`${id}`,cacheTimeFullProject, JSON.stringify(data));
                                 const result = await data.listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.slice(start, Number(start)+Number(limit));
                                 res.send(result.map(({resNum, desc, length, codewords})=>({resNum, desc, length, codewords})));
                             }
@@ -148,52 +163,22 @@ module.exports = {
         if(pageNumber==undefined) pageNumber = 1;
         if(limit==undefined) limit = 10;
         const start = (pageNumber-1)*limit;
-        client.get(`${projectId}`,async (err, data) =>{
-            if(err){
-                res.send({err});
-            }else{
+        client.get(`${JSON.stringify(req.body)}`, (err, data)=>{
+            if(err) res.send(err);
+            else{
                 if(data){
-                    console.log("fetch data from cache");
-                    let result = await JSON.parse(data);
-                    const promises =filters.map(async iterate=>{
-                        if(iterate.filter === 1){ //sort By Response Base On Length Asc Order
-                            result = await fiterByLengthAscOrder(questionId, result);
-                        }else if(iterate.filter ===2){ //sort By Response Base On Length Asc Order
-                            result = await fiterByLengthDescOrder(questionId, result);  
-                        }else if(iterate.filter ===3){ //sort By Response Base On Alphabet Asc Order
-                            result = await fiterByResponseAscOrder(questionId, result);
-                        }else if(iterate.filter ===4){ //sort By Response Base On Alphabet Desc Order
-                            result = await fiterByResponseDescOrder(questionId, result);
-                        }else if(iterate.filter ===5){ //sort By Response Base On Pattern Including
-                            result = await fiterByResponsePatternMatch(questionId, iterate.pattern, result);
-                        }else if(iterate.filter ===6){ //sort By Response Base On ExactPattern Match
-                            result = await fiterByResponsePatternExactMatch(questionId, iterate.pattern, result);
-                        }else if(iterate.filter === 7){ //sort By Response Base On Codeword Match
-                            result = await fiterByResponseOnCodewordMatch(questionId, iterate.codeword, result);
-                        }else if(iterate.filter ===9) {// sort By Response Which Have Not Any Codeword
-                            result = await fiterByResponseWhichHaveNotAnyCodeword(questionId, iterate._result);
-                        }
-                    });
-                    await Promise.all(promises)
-                    res.send(result.slice(start, Number(start)+Number(limit)));
-                }else{
-                    console.log("load data from database");
-                    await Project.findById(projectId).
-                        populate({ path: 'listOfQuestion', model: Question,
-                        populate:
-                            {
-                                path: 'listOfResponses', 
-                                model:Response,
-                                options: { sort: { 'resNum': 'asc' }},
-                                populate:{path: 'codewords', model: Codeword}
-                            }
-                        }).exec(async(err, result) => {
-                            if(err){
-                                res.send({err:err});
-                            }else{
-                                console.log("load data from database : " + result);
-                                client.setex(`${projectId}`,cacheTime, JSON.stringify(result));
-                                const promises =filters.map(async iterate=>{
+                    console.log('read data from filter cache');
+                    res.send(JSON.parse(data).slice(start, Number(start)+Number(limit)));
+                }
+                else{
+                    client.get(`${projectId}`,async (err, data) =>{
+                        if(err){
+                            res.send({err});
+                        }else{
+                            if(data){
+                                console.log("fetch data from cache");
+                                let result = await JSON.parse(data);
+                                const promises = filters.map(async iterate=>{
                                     if(iterate.filter === 1){ //sort By Response Base On Length Asc Order
                                         result = await fiterByLengthAscOrder(questionId, result);
                                     }else if(iterate.filter ===2){ //sort By Response Base On Length Asc Order
@@ -203,24 +188,74 @@ module.exports = {
                                     }else if(iterate.filter ===4){ //sort By Response Base On Alphabet Desc Order
                                         result = await fiterByResponseDescOrder(questionId, result);
                                     }else if(iterate.filter ===5){ //sort By Response Base On Pattern Including
-                                        result = await fiterByResponsePatternMatch(questionId, pattern, result);
+                                        result = await fiterByResponsePatternMatch(questionId, iterate.pattern, result);
                                     }else if(iterate.filter ===6){ //sort By Response Base On ExactPattern Match
                                         result = await fiterByResponsePatternExactMatch(questionId, iterate.pattern, result);
                                     }else if(iterate.filter === 7){ //sort By Response Base On Codeword Match
                                         result = await fiterByResponseOnCodewordMatch(questionId, iterate.codeword, result);
+                                    }else if(iterate.filter === 8){ //sort By Response Base On Codeword Match
+                                        result = await fiterByResponseOnCodewordDisMatch(questionId, iterate.codeword, result);
                                     }else if(iterate.filter ===9) {// sort By Response Which Have Not Any Codeword
-                                        result = await fiterByResponseWhichHaveNotAnyCodeword(questionId, iterate._result);
+                                        result = await fiterByResponseWhichHaveNotAnyCodeword(questionId, result);
                                     }
-                                    
                                 });
-                                await Promise.all(promises)
-                                res.send(result.slice(start, Number(start)+Number(limit)));
+                                await Promise.all(promises).then(()=> {
+                                    client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(result));
+                                    res.send(result.slice(start, Number(start)+Number(limit)));
+                                });
                                 
+                            }else{
+                                console.log("load data from database");
+                                await Project.findById(projectId).
+                                    populate({ path: 'listOfQuestion', model: Question,
+                                    populate:
+                                        {
+                                            path: 'listOfResponses', 
+                                            model:Response,
+                                            options: { sort: { 'resNum': 'asc' }},
+                                            populate:{path: 'codewords', model: Codeword}
+                                        }
+                                    }).exec(async(err, result) => {
+                                        if(err){
+                                            res.send({err:err});
+                                        }else{
+                                            console.log("load data from database : " + result);
+                                            client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(result));
+                                            const promises =  filters.map(async iterate=>{
+                                                if(iterate.filter === 1){ //sort By Response Base On Length Asc Order
+                                                    result = await fiterByLengthAscOrder(questionId, result);
+                                                }else if(iterate.filter ===2){ //sort By Response Base On Length Asc Order
+                                                    result = await fiterByLengthDescOrder(questionId, result);  
+                                                }else if(iterate.filter ===3){ //sort By Response Base On Alphabet Asc Order
+                                                    result = await fiterByResponseAscOrder(questionId, result);
+                                                }else if(iterate.filter ===4){ //sort By Response Base On Alphabet Desc Order
+                                                    result = await fiterByResponseDescOrder(questionId, result);
+                                                }else if(iterate.filter ===5){ //sort By Response Base On Pattern Including
+                                                    result = await fiterByResponsePatternMatch(questionId, iterate.pattern, result);
+                                                }else if(iterate.filter ===6){ //sort By Response Base On ExactPattern Match
+                                                    result = await fiterByResponsePatternExactMatch(questionId, iterate.pattern, result);
+                                                }else if(iterate.filter === 7){ //sort By Response Base On Codeword Match
+                                                    result = await fiterByResponseOnCodewordMatch(questionId, iterate.codeword, result);
+                                                }else if(iterate.filter === 8){ //sort By Response Base On Codeword Match
+                                                    result = await fiterByResponseOnCodewordDisMatch(questionId, iterate.codeword, result);
+                                                }else if(iterate.filter ===9) {// sort By Response Which Have Not Any Codeword
+                                                    result = await fiterByResponseWhichHaveNotAnyCodeword(questionId, result);
+                                                }
+                                                
+                                            });
+                                            await Promise.all(promises).then(()=> {
+                                                client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(result));
+                                                res.send(result.slice(start, Number(start)+Number(limit)));
+                                            });
+                                            
+                                        }
+                                }); 
                             }
-                    }); 
+                        }
+                    });
                 }
             }
-        });
+        })
     }
     // const sortData = await JSON.parse(data).listOfQuestion.find(ele=>ele._id==questionId).listOfResponses.filter(ele=>ele.length>=min && ele.length<=max);
    

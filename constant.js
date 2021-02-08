@@ -14,7 +14,8 @@ const registerEmail_text = 'Verify !!!';
 const forgetPassEmail_from = 'Reset password from Survey Buddy <info@surveybuddy.com>';
 const forgetPassEmail_subject = 'Reset your password';
 const forgetPassEmail_text = 'Reset password';
-const cacheTime = '3600'; //1 hour
+const cacheTimeFullProject = '3600'; //1 hour
+const cacheTimeForFilter = '600'; //10mint
 
 module.exports ={
    loginTokenExpiresIn,
@@ -28,5 +29,6 @@ module.exports ={
    forgetPassEmail_subject,
    forgetPassEmail_text,
    frontendUrl,
-   cacheTime
+   cacheTimeFullProject,
+   cacheTimeForFilter
 }

@@ -89,8 +89,10 @@ module.exports ={
                                         });
 
                                     })
-                                    await Promise.all(promises)
-                                    res.status(STATUS_CODE.Created).send({message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
+                                    await Promise.all(promises).then(()=>
+                                       res.status(STATUS_CODE.Created).send({message: RESPONSE_MESSAGE.projectCreated, projectId: project._id })
+                                    )
+                                    
                                 }//eles body finish
                             })
                         }else{
