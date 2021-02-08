@@ -211,6 +211,7 @@ module.exports = {
                                     }else if(iterate.filter ===9) {// sort By Response Which Have Not Any Codeword
                                         result = await fiterByResponseWhichHaveNotAnyCodeword(questionId, iterate._result);
                                     }
+                                    
                                 });
                                 await Promise.all(promises)
                                 res.send(result.slice(start, Number(start)+Number(limit)));

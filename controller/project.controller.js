@@ -45,7 +45,7 @@ module.exports ={
                                 }else{
                                     const data = result.Body.toString("utf8").split('\r\n');
                                     let row = [];
-                                    await coloumns.map(ele=>{
+                                    const promises = await coloumns.map(ele=>{
                                         const newQuestion = new Question({
                                             _id: new mongoose.Types.ObjectId(),
                                              desc: ele.question,
@@ -89,6 +89,7 @@ module.exports ={
                                         });
 
                                     })
+                                    await Promise.all(promises)
                                     res.status(STATUS_CODE.Created).send({message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
                                 }//eles body finish
                             })
