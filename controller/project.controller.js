@@ -113,5 +113,27 @@ module.exports ={
                 res.status(STATUS_CODE.Ok).send({project: project });
              }
         }) 
+    },
+
+    userSearch : async (req, res) => {
+        const query = req.body.userQuery;
+        if(query!==''){
+            await User.find({
+                $and:[{verified: true},
+                    { $or:[
+                        {name: { "$regex": query, "$options": 'i' }},
+                        {email: { "$regex": query, "$options": 'i' }}
+                    ]}]
+            }, (err,users)=> { 
+                    if(err){
+                        console.log(err);
+                    }else{
+                        res.send(users);
+                    }
+                }
+            );
+        }else{
+            res.send(""); 
+        }
     }
 }

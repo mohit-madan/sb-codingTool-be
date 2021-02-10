@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { authenticateUser } = require('../auth_config/auth');
 const {uploadFile, deleteFile, getFile} = require('../controller/documentFile.controller');
-const {createProject, projectDetails} = require('../controller/project.controller');
-const {getResponse, filterResponse} = require('../controller/response.controller');
+const {createProject, projectDetails, userSearch} = require('../controller/project.controller');
+const {getResponse, operatorResponse} = require('../controller/response.controller');
 
 //upload project document file
 router.post('/uploadFile', authenticateUser, uploadFile );
@@ -20,10 +20,13 @@ router.post('/createProject', authenticateUser, createProject);
 //get details of project
 router.post('/projectDetails', authenticateUser, projectDetails);
 
+// search user by name email phone (make sure account is verified)
+router.post('/userSearch', userSearch);
+
 // getResponse in pagination
 router.post('/response/:pageNumber/:limit', getResponse);
 
-// filter Response in pagination
-router.post('/filter/:pageNumber/:limit', filterResponse);
+// operator Response in pagination
+router.post('/operator/:pageNumber/:limit', operatorResponse);
 
 module.exports = router;

@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const codewordSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
-    tag: String
+    tag: String,
+    key: Number
 });
 
 
