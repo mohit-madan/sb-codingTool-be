@@ -1,4 +1,5 @@
 const STATUS_CODE = require('../statusCode');
+const logger = require('../logger');('../statusCode')
 const Project = require('../models/project.model');
 const Question = require('../models/question.model');
 const Response = require('../models/response.model');
@@ -175,10 +176,10 @@ module.exports = {
         const start = (pageNumber - 1) * limit;
         client.get(`${id}`, async (err, data) => {
             if (err) {
-                res.send({ err });
+                res.status(STATUS_CODE.ServerError).send({ err });
             } else {
                 if (data) {
-                    console.log("fetch data from cache");
+                    logger.info("fetch data from cache");
                     const result = await JSON.parse(data).listOfQuestion
                         .filter(ele => {
                             for (let i = 0; i < questions.length; i++) {
@@ -191,13 +192,13 @@ module.exports = {
                     for (let i = 0; i < result.length; i++) {
                         response = [...response, ...result[i]];
                     }
-                    res.send(response.slice(start, Number(start) + Number(limit))
+                    res.status(STATUS_CODE.Ok).send(response.slice(start, Number(start) + Number(limit))
                         .map(({ resNum, desc, length, codewords }) => {
                             return { resNum, desc, length, codewords };
                         })
                     );
                 } else {
-                    console.log("load data from database");
+                    logger.info("load data from database");
                     await Project.findById(id).
                         populate({
                             path: 'listOfQuestion', model: Question,
@@ -210,7 +211,7 @@ module.exports = {
                             }
                         }).exec(async (err, data) => {
                             if (err) {
-                                res.send({ err: err });
+                                res.status(STATUS_CODE.ServerError).send({ err: err });
                             } else {
                                 client.setex(`${id}`, cacheTimeFullProject, JSON.stringify(data));
                                 const result = await data.listOfQuestion
@@ -224,7 +225,7 @@ module.exports = {
                                 for (let i = 0; i < result.length; i++) {
                                     response = [...response, ...result[i]];
                                 }
-                                res.send(response.slice(start, Number(start) + Number(limit))
+                                res.status(STATUS_CODE.Ok).send(response.slice(start, Number(start) + Number(limit))
                                     .map(({ resNum, desc, length, codewords }) => {
                                         return { resNum, desc, length, codewords };
                                     })
@@ -243,11 +244,11 @@ module.exports = {
         if (limit == undefined) limit = 10;
         const start = (pageNumber - 1) * limit;
         client.get(`${JSON.stringify(req.body)}`, (err, data) => {
-            if (err) res.send(err);
+            if (err) res.status(STATUS_CODE.ServerError).send(err);
             else {
                 if (data) {
                     let totalRes;
-                    console.log('read data from operator cache');
+                    logger.info('read data from operator cache');
                     client.get(`${projectId}`, async (err, result) => {
                         if (result) {
                             result = await JSON.parse(result).listOfQuestion
@@ -262,13 +263,13 @@ module.exports = {
                                 response = [...response, ...result[i]];
                             }
                             totalRes = response.length;
-                            res.send({
+                            res.status(STATUS_CODE.Ok).send({
                                 result: JSON.parse(data).slice(start, Number(start) + Number(limit)),
                                 operatorRes: JSON.parse(data).length,
                                 totalRes,
                             });
                         } else {
-                            res.send({ err: "cache timeout Error" });
+                            res.status(STATUS_CODE.ServerError).send({ err: "cache timeout Error" });
                         }
                     });
 
@@ -276,10 +277,10 @@ module.exports = {
                 else {
                     client.get(`${projectId}`, async (err, data) => {
                         if (err) {
-                            res.send({ err });
+                            res.status(STATUS_CODE.ServerError).send({ err });
                         } else {
                             if (data) {
-                                console.log("fetch data from cache");
+                                logger.info("fetch data from cache");
                                 let result = await JSON.parse(data).listOfQuestion
                                     .filter(ele => {
                                         for (let i = 0; i < questions.length; i++) {
@@ -296,7 +297,7 @@ module.exports = {
                                 const filter = applyFilter(result, operators);
                                 filter.then((filtered) => {
                                     client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(filtered));
-                                    res.send({
+                                    res.status(STATUS_CODE.Ok).send({
                                         result: filtered.slice(start, Number(start) + Number(limit)),
                                         operatorRes: filtered.length,
                                         totalRes
@@ -305,7 +306,7 @@ module.exports = {
 
 
                             } else {
-                                console.log("load data from database");
+                                logger.info("load data from database");
                                 await Project.findById(projectId).
                                     populate({
                                         path: 'listOfQuestion', model: Question,
@@ -318,7 +319,7 @@ module.exports = {
                                         }
                                     }).exec(async (err, data) => {
                                         if (err) {
-                                            res.send({ err: err });
+                                            res.status(STATUS_CODE.ServerError).send({ err: err });
                                         } else {
                                             client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
                                             let result = await data.listOfQuestion
@@ -337,7 +338,7 @@ module.exports = {
                                             const filter = applyFilter(result, operators);
                                             filter.then((filtered) => {
                                                 client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(filtered));
-                                                res.send({
+                                                res.status(STATUS_CODE.Ok).send({
                                                     result: filtered.slice(start, Number(start) + Number(limit)),
                                                     operatorRes: filtered.length,
                                                     totalRes

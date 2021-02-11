@@ -13,7 +13,7 @@ module.exports = {
         from: '+12056563807',
         to: `${number}`
         })
-        .then(message => console.log(message.sid))
-        .catch(err => console.log(err));
+        .then(message => logger.info(message.sid))
+        .catch(err => logger.error(err));
     }
 };

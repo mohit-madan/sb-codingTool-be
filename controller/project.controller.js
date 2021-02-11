@@ -3,6 +3,7 @@ const Project = require('../models/project.model');
 const Question = require('../models/question.model');
 const Response = require('../models/response.model');
 const STATUS_CODE = require('../statusCode')
+const logger = require('../logger')
 const RESPONSE_MESSAGE = require('../responseMessage')
 const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
@@ -41,7 +42,7 @@ module.exports ={
                             }
                             s3.getObject(params, async(err,result) => {
                                 if(err){
-                                    res.send({err});
+                                    res.status(STATUS_CODE.ServerError).send({err});
                                 }else{
                                     const data = result.Body.toString("utf8").split('\r\n');
                                     let row = [];
@@ -51,12 +52,12 @@ module.exports ={
                                              desc: ele.question,
                                         }).save((err, question)=>{
                                             if(err){
-                                                return res.send({err:err});
+                                                return res.status(STATUS_CODE.ServerError).send({err:err});
                                             }else{
                                                 Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion : question._id }},{ upsert: true, new: true }).
                                                 exec((err, project)=>{
                                                     if(err){
-                                                        return res.send({err:err});
+                                                        return res.status(STATUS_CODE.ServerError).send({err:err});
                                                     }else{
                                                         let resNum = 0;
                                                         for(let i =1; i < data.length; i++){
@@ -73,11 +74,11 @@ module.exports ={
                                                                     questionId : question._id
                                                                 }).save((err, response) => {
                                                                 if(err){
-                                                                    res.send({err});
+                                                                    res.status(STATUS_CODE.ServerError).send({err});
                                                                 }else{
                                                                     Question.findByIdAndUpdate(question._id, { $push: { listOfResponses : response._id }},{ upsert: true, new: true }).
                                                                     exec((err,result)=>{
-                                                                        if(err) {return res.send({err:err})}
+                                                                        if(err) {return res.status(STATUS_CODE.ServerError).send({err:err})}
                                                                     });
                                                                 }
                                                                 }) 
@@ -96,7 +97,7 @@ module.exports ={
                                 }//eles body finish
                             })
                         }else{
-                            res.send({message: 'only .csv file logic implement'});
+                            res.status(STATUS_CODE.Ok).send({message: 'only .csv file logic implement'});
                         }
                     }
                 }); 
@@ -126,14 +127,14 @@ module.exports ={
                     ]}]
             }, (err,users)=> { 
                     if(err){
-                        console.log(err);
+                        logger.error(err);
                     }else{
-                        res.send(users);
+                        res.status(STATUS_CODE.Ok).send(users);
                     }
                 }
             );
         }else{
-            res.send(""); 
+            res.status(STATUS_CODE.Ok).send(""); 
         }
     }
 }

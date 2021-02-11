@@ -1,0 +1,8 @@
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-11T07:10:41.711Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-11T07:10:43.088Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-11T07:20:34.174Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-11T07:20:35.730Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-11T07:26:19.828Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-11T07:26:21.172Z"}
+{"message":"load data from database","level":"info","timestamp":"2021-02-11T07:26:24.157Z"}
+{"message":"read data from operator cache","level":"info","timestamp":"2021-02-11T07:27:36.528Z"}

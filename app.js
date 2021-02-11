@@ -6,6 +6,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const { authenticateUser } = require('./auth_config/auth');
+const logger = require('./logger');
 
 // create own app
 const app = express();
@@ -53,8 +54,8 @@ mongoose.connect(process.env.DB_URL,
         useCreateIndex: true,
         useFindAndModify: false
      })
-    .then(() => console.log('Connected to Mongo Database successfully'))
-    .catch(err => console.log(err));
+    .then(() => logger.info('Connected to Mongo Database successfully'))
+    .catch(err => logger.error(err));
 
 //Passport middleware
 app.use(passport.initialize());
@@ -71,4 +72,4 @@ app.get('/', authenticateUser, (req, res) =>{
 const port = process.env.PORT || 5000;
 
 //config listen
-server.listen(port, () => console.log(`server is running at port: ${port}`));
+server.listen(port, () => logger.info(`server is running at port: ${port}`));
