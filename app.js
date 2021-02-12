@@ -52,6 +52,7 @@ const leftmenuCodes=({i,value})=>{
 }
 
 io.on('connection', socket => {
+
     socket.on('input-box', ({num,value}) => {
       codes({num,value})
       io.emit('input-box', {num,value})
@@ -60,14 +61,46 @@ io.on('connection', socket => {
       keywords({num,value})
       io.emit('keywords', {num,value})
     })
+
+
+
+
     socket.on('left-menu-codes', ({i,value}) => {
+      console.log( socket.client.conn.server.clientsCount + " users connected" );
       leftmenuCodes({i,value})
       io.emit('left-menu-codes', {i,value})
     })
     socket.on('left-menu-state', (values) => {
+      console.log( socket.client.conn.server.clientsCount + " users connected" );
       console.log((values))
       io.emit('left-menu-state', {values})
     })
+
+
+
+
+    socket.on('left-menu-form-box', (values) => {
+      console.log((values))
+      io.emit('left-menu-form-box', {values})
+    })
+    socket.on('left-menu-add-code', (values) => {
+      console.log((values))
+      io.emit('left-menu-add-code', {values})
+    })
+
+    socket.on('left-menu-submit-edited-code', ({id, newName}) => {
+      console.log(({id, newName}))
+      io.emit('left-menu-submit-edited-code', {id, newName})
+    })
+    
+    socket.on('left-menu-codes-object', (value) => {
+      console.log(value)
+      io.emit('left-menu-codes-object',value)
+    })
+
+
+    console.log(io.engine.clientsCount)
+
 })
 
 
@@ -94,7 +127,9 @@ http.listen(4000, function() {
   console.log('http :== listening on port 4000')
 })
 
-//mongoose connect and set plugins
+// mongoose connect and set plugins
+
+
 // mongoose.connect(process.env.DB_URL,
 //     { 
 //         useNewUrlParser: true, 
@@ -119,5 +154,5 @@ http.listen(4000, function() {
 // // define port for app
 // const port = process.env.PORT || 5000;
 
-//config listen
+// // config listen
 // app.listen(port, () => console.log(`server is running at port: ${port}`));
