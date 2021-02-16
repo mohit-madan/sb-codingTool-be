@@ -6,7 +6,7 @@ const questionSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     desc: String, 
     listOfResponses:[{type: mongoose.Schema.Types.ObjectId, ref: 'Response'}],
-    percentageOfCoded: Number,
+    percentageOfCoded: {type:Number, Default: 0},
     //codebook relative Quetion
     codebook:{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'}
 });

@@ -1,0 +1,121 @@
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:08:57.484Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:08:58.740Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:09:03.091Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:09:03.976Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:10:28.651Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:10:29.629Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:13:45.597Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:13:51.855Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:14:08.611Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:14:09.784Z"}
+{"message":"load data from database","level":"info","timestamp":"2021-02-16T06:17:44.136Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:20:01.179Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:20:07.387Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:21:48.406Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:21:54.497Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:28:43.811Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:28:49.984Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:30:38.861Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:30:39.745Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:35:40.289Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:35:42.065Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:36:23.081Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:36:23.906Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:36:28.792Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:36:29.554Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:38:09.600Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:38:11.385Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:41:18.297Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:41:24.291Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:56:19.173Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:56:25.417Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:00:26.387Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:00:28.396Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:09:17.564Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:09:24.482Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:09:28.024Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:09:33.946Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:10:13.482Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:10:14.290Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:15:05.666Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:15:11.618Z"}
+{"message":"load data from database","level":"info","timestamp":"2021-02-16T07:15:52.468Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:19:50.337Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:19:56.397Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:20:42.950Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:20:43.843Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:22:46.550Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:22:47.574Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:25:13.382Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:25:14.376Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:26:20.233Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:26:21.313Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:27:15.846Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:27:22.047Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:29:49.581Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:29:55.627Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:30:40.764Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:30:46.675Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:31:17.995Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:31:18.830Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:31:49.806Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:31:55.672Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:35:35.070Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:35:41.353Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:39:44.783Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:39:51.023Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:43:24.803Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:43:30.967Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:46:33.290Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:46:34.315Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:47:20.868Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:47:26.823Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:48:07.700Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:48:17.463Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:48:18.379Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:49:31.796Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:49:32.963Z"}
+{"message":"load data from database","level":"info","timestamp":"2021-02-16T07:50:27.739Z"}
+{"message":"fetch data from cache","level":"info","timestamp":"2021-02-16T07:50:34.867Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:51:12.517Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:51:14.046Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:52:29.602Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:52:30.822Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:28:01.474Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:28:07.699Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:42:55.767Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:43:01.928Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:45:46.065Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:45:47.060Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:46:23.199Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:46:24.032Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:46:52.878Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:46:55.295Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:47:10.938Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:47:16.920Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:48:23.664Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:48:24.750Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:48:42.451Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:48:43.333Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:49:49.998Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:49:51.018Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:50:31.148Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:50:37.022Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:51:12.766Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:51:14.025Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:20:58.160Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:21:03.653Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:22:04.170Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:22:05.124Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:27:09.554Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:27:10.638Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:33:39.696Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:33:40.772Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:44:59.068Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:45:07.050Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:48:35.056Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:48:36.221Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:51:10.882Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:51:12.104Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:51:47.649Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:51:48.553Z"}

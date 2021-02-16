@@ -17,7 +17,7 @@ const projectSchema = new mongoose.Schema({
     assignedTo:[{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     lang: {type: String, Default: 'English'},
     //array of codebook of question in the project 
-    codebooks:[{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'}]
+    codebook:{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'}
 });
 
 

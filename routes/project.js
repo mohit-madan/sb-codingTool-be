@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { authenticateUser } = require('../auth_config/auth');
 const {uploadFile, deleteFile, getFile} = require('../controller/documentFile.controller');
-const {createProject, projectDetails, userSearch} = require('../controller/project.controller');
+const {createProject, projectDetails, userSearch, questionCodebook} = require('../controller/project.controller');
 const {getResponse, operatorResponse} = require('../controller/response.controller');
 
 //upload project document file
@@ -28,5 +28,7 @@ router.post('/response/:pageNumber/:limit', getResponse);
 
 // operator Response in pagination
 router.post('/operator/:pageNumber/:limit', operatorResponse);
+
+router.post('/questionCodebook', questionCodebook);
 
 module.exports = router;
