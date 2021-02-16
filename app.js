@@ -7,7 +7,12 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const { authenticateUser } = require('./auth_config/auth');
 const logger = require('./logger');
-
+const {
+    userJoin,
+    getCurrentUser,
+    userLeave,
+    getRoomUsers
+} = require('./socketUser');
 // create own app
 const app = express();
 const server = require('http').createServer(app);
@@ -17,25 +22,51 @@ const io = socketio(server);
 
 io.on('connection', socket=>{
     
-    socket.join('join', ({username, room})=>{
-         socket.join(room);
-         // simple emit a message
-         socket.emit('message', 'Welcome to Survey Buddy'); // emit to single user who is connecting
+    //user connect
+    socket.on('joinRoom', ({username, room})=>{
+        const user = userJoin(socket.id, username, room);
 
-        //new user is connected
-         socket.broadcast.to(room).emit('message', `New ${username} is connected`);// emit to all users except to connected user
+        socket.join(user.room);
+        // simple emit a message(emit to single user who is connecting)
+        // socket.emit('message', 'Welcome to Survey Buddy');  
+
+        //new user is connected (emit to all users except to connected user)
+        // socket.broadcast
+        // .to(user.room)
+        // .emit('message', `New ${username} is connected`);
+    
+        // Send users and room info (all user)
+        io.to(user.room).emit('roomUsers', {
+            room: user.room,
+            users: getRoomUsers(user.room)
+        });
     })
     
 
     //user disconnected
     socket.on('disconnect', ()=>{
-        io.emit('message', 'User is disconnected');           // emit to all users
+        const user = userLeave(socket.id);
+        if (user) {
+
+            //(all user) but here loginUser did exit
+            // io.to(user.room).emit(
+            //   'message', `${user.username} has left the chat`);
+      
+            // Send users and room info (all user) but here loginUser did exit
+            io.to(user.room).emit('roomUsers', {
+              room: user.room,
+              users: getRoomUsers(user.room)
+            });
+        }
     })
 
-    //do some opretion
-    socket.on('opretion', opretion=>{
-        io.emit('message', opretion)
-    })
+    // Listen for operation
+    socket.on('makeOperation', operation => {
+        const user = getCurrentUser(socket.id);
+        //here also make change to db*******************
+        //triger operation to connect all users to this room
+        io.to(user.room).emit('operation', operation);
+    });
 })
 
 //middle ware
