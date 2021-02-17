@@ -35,7 +35,7 @@ function getIndicesOf(searchStr, str) {
 
     while ((index = str.indexOf(searchStr, startIndex)) > -1) {
         const fIndex = index;
-        const lIndex = index + str.length - 1;
+        const lIndex = index + searchStr.length - 1;
         indices.push({ fIndex: fIndex, lIndex: lIndex, pattern: searchStr });
         startIndex = index + searchStr.length;
     }

@@ -40,8 +40,8 @@ module.exports = {
     },
     
     deleteCodeword: (req, res) => {
-        const codewordId = req.params.codewordId;
-        codeword.findByIdAndRemove(codewordId, (err, result) => {
+        const codewordId = req.body.codewordId;
+        Codeword.findByIdAndRemove(codewordId, (err, result) => {
             if (err) {
                 if(err) res.status(STATUS_CODE.ServerError).send(err);
             }else{
