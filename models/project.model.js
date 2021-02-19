@@ -10,7 +10,7 @@ const projectSchema = new mongoose.Schema({
     industry:String,
     type: String,
     tags:[String],
-    docKey:  { type: String, trim: true , required: true, unique: true },
+    docKey:  { type: String, trim: true , required: true },
     listOfQuestion:[{type: mongoose.Schema.Types.ObjectId, ref: 'Question'}],
     CreationDate: Date,
     CreatedBy:{type: mongoose.Schema.Types.ObjectId, ref: 'User'},

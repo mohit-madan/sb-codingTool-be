@@ -1,180 +1,125 @@
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:08:57.484Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:08:58.740Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:09:03.091Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:09:03.976Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:10:28.651Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:10:29.629Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:13:45.597Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:13:51.855Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:14:08.611Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:14:09.784Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-02-16T06:17:44.136Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:20:01.179Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:20:07.387Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:21:48.406Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:21:54.497Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:28:43.811Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:28:49.984Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:30:38.861Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:30:39.745Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:35:40.289Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:35:42.065Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:36:23.081Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:36:23.906Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:36:28.792Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:36:29.554Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:38:09.600Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:38:11.385Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:41:18.297Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:41:24.291Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T06:56:19.173Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T06:56:25.417Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:00:26.387Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:00:28.396Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:09:17.564Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:09:24.482Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:09:28.024Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:09:33.946Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:10:13.482Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:10:14.290Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:15:05.666Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:15:11.618Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-02-16T07:15:52.468Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:19:50.337Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:19:56.397Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:20:42.950Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:20:43.843Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:22:46.550Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:22:47.574Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:25:13.382Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:25:14.376Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:26:20.233Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:26:21.313Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:27:15.846Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:27:22.047Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:29:49.581Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:29:55.627Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:30:40.764Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:30:46.675Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:31:17.995Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:31:18.830Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:31:49.806Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:31:55.672Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:35:35.070Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:35:41.353Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:39:44.783Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:39:51.023Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:43:24.803Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:43:30.967Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:46:33.290Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:46:34.315Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:47:20.868Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:47:26.823Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:48:07.700Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:48:17.463Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:48:18.379Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:49:31.796Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:49:32.963Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-02-16T07:50:27.739Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-02-16T07:50:34.867Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:51:12.517Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:51:14.046Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T07:52:29.602Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T07:52:30.822Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:28:01.474Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:28:07.699Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:42:55.767Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:43:01.928Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:45:46.065Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:45:47.060Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:46:23.199Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:46:24.032Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:46:52.878Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:46:55.295Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:47:10.938Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:47:16.920Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:48:23.664Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:48:24.750Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:48:42.451Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:48:43.333Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:49:49.998Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:49:51.018Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:50:31.148Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:50:37.022Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T08:51:12.766Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T08:51:14.025Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:20:58.160Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:21:03.653Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:22:04.170Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:22:05.124Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:27:09.554Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:27:10.638Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:33:39.696Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:33:40.772Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:44:59.068Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:45:07.050Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:48:35.056Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:48:36.221Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:51:10.882Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:51:12.104Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:51:47.649Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:51:48.553Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T09:56:56.131Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T09:56:57.370Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:03:20.575Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:03:21.630Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:04:25.412Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:04:31.484Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:07:22.298Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:07:28.403Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:08:35.993Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:08:42.176Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:10:36.663Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:10:37.982Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:12:04.341Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:12:10.434Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:14:05.217Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:14:06.269Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:14:17.678Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:14:19.431Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:17:40.418Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:17:41.617Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:18:07.332Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:18:13.315Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:20:07.416Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:20:13.713Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:22:26.648Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:22:27.850Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:27:46.628Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:27:52.750Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T10:30:54.974Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T10:31:01.178Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-02-16T14:41:15.501Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-02-16T14:43:05.254Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T14:44:11.130Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T14:44:12.330Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-02-16T14:44:30.907Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-16T14:45:20.042Z"}
-{"message":"read data from operator cache","level":"info","timestamp":"2021-02-16T14:45:20.204Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-16T14:45:21.424Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-02-16T14:45:26.690Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T06:39:05.555Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T06:39:06.797Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T06:41:51.193Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T06:41:52.578Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T06:55:28.085Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T06:55:37.464Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T07:21:45.243Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T07:21:46.374Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T07:27:08.510Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T07:27:09.780Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T07:37:42.074Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T07:37:43.367Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T08:43:50.182Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T08:43:51.325Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T08:43:56.358Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T08:43:57.464Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T08:45:12.048Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T08:45:13.161Z"}
-{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T08:59:30.123Z"}
-{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T08:59:31.875Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T16:33:30.004Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T16:33:36.281Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T16:45:12.790Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T16:45:18.879Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T18:41:54.351Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T18:41:55.339Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T18:54:49.086Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T18:54:49.930Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T19:10:51.779Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T19:10:52.589Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T19:35:31.061Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T19:35:31.977Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-17T19:40:52.063Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-17T19:40:57.988Z"}
+{"message":"server is running at port: 5000","level":"info","timestamp":"2021-02-18T06:19:33.191Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:19:42.432Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:25:44.287Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:25:58.987Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:29:37.454Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:32:31.584Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:32:51.646Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:34:59.515Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:52:35.610Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T06:57:30.721Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T07:01:47.135Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T07:24:00.555Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T07:58:40.912Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:00:54.162Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:04:49.825Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:08:00.458Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:09:55.298Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:15:56.183Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:23:22.819Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:27:19.170Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:31:07.240Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:32:42.985Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:36:27.724Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T08:37:19.174Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:07:30.796Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:09:51.177Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:11:05.129Z"}
+{"message":"load data from database","level":"info","timestamp":"2021-02-18T11:12:31.838Z"}
+{"message":"fetch data from cache","level":"info","timestamp":"2021-02-18T11:12:36.197Z"}
+{"message":"fetch data from cache","level":"info","timestamp":"2021-02-18T11:12:37.971Z"}
+{"message":"fetch data from cache","level":"info","timestamp":"2021-02-18T11:12:38.953Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:21:53.746Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:22:33.195Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:24:12.809Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:25:52.074Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:32:02.702Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T11:58:17.345Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:00:33.278Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:06:47.510Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:07:39.915Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:08:13.782Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:09:48.241Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:09:55.700Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:11:07.010Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:12:56.733Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:17:34.159Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:22:26.474Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T12:25:26.614Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T14:05:11.263Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T14:08:27.236Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T14:09:59.121Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T14:11:57.274Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T14:15:20.978Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T17:58:02.131Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:00:08.955Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:02:20.738Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:05:47.313Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:17:05.566Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:31:29.124Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:33:28.163Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:34:54.196Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:35:42.558Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T18:53:49.754Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T19:15:37.057Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T19:17:23.537Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-18T19:18:54.925Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T06:22:12.310Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T06:22:22.813Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T06:27:10.289Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T06:32:36.710Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T06:34:00.208Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T06:38:12.672Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T06:43:32.568Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T07:05:15.552Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T07:12:56.692Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T07:17:21.649Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T07:17:28.131Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T07:28:19.347Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T14:47:58.709Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T14:48:05.996Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T14:49:55.741Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T15:44:21.737Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T16:21:08.449Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T16:27:57.548Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T16:37:52.356Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T16:41:34.209Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T16:45:08.925Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T16:50:15.298Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T17:09:30.923Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T17:20:02.949Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T17:24:46.651Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T17:30:24.167Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T17:37:23.543Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T17:39:31.905Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T17:54:03.676Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:00:18.677Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:06:27.708Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:08:01.953Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:08:32.285Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:13:56.502Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:16:57.724Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:28:24.701Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:29:55.181Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:44:06.282Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:45:41.234Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:46:09.287Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T18:48:20.528Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T19:11:01.122Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T19:15:46.977Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T19:15:54.689Z"}
+{"message":"Connected to Mongo Database successfully","level":"info","timestamp":"2021-02-19T19:18:20.668Z"}

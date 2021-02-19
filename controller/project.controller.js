@@ -14,117 +14,129 @@ const s3 = new AWS.S3({
     secretAccessKey: process.env.AWS_ACCESS_SECRET
 });
 
-module.exports = {
-    createProject: (req, res) => {
-        const { name, desc, key, coloumns, industry, type, tags } = req.body;
-        const projectCodebook = new Codebook({
-            _id: new mongoose.Types.ObjectId()
-        }).save((err, codebook) => {
-            if(err) return res.status(STATUS_CODE.ServerError).send(err);
-            else{
-                const newProject = new Project({
+const createCodebook = async () => {
+    const newCodebook = new Codebook({
+        _id: new mongoose.Types.ObjectId()
+    });
+    const codebook = await newCodebook.save()
+        .then(codebook => codebook)
+        .catch(err => {
+            console.log("Error during create codebook");
+            console.trace(err);
+        });
+    return codebook._id;
+}
+
+const createQuestion = async (desc, codebookId) => {
+    const newQuestion = new Question({
+        _id: new mongoose.Types.ObjectId(),
+        desc: desc,
+        codebook: codebookId
+    });
+    const question = await newQuestion.save()
+        .then(question => question)
+        .catch(err => {
+            console.log("Error during create question");
+            console.trace(err);
+        });
+    return question._id;
+}
+
+const fetchSomeResponse = async (data, questionNumber, questionId) => {
+    let resNum = 0;
+    let responseList = []
+    let count=0;
+    return new Promise( (resolve) => {
+        data.forEach((cr) => {
+            row = cr.split(',');
+            count++;
+            if (row[questionNumber] === undefined || row[questionNumber] == '' || row[questionNumber] == '\r\n') {
+                console.log('');
+            } else {
+                resNum++;
+                const response = {
                     _id: new mongoose.Types.ObjectId(),
-                    name: name,
-                    desc: desc,
-                    docKey: key,
-                    industry: industry,
-                    type: type,
-                    tags: tags,
-                    codebook: codebook._id
-                }).save((err, project) => {
-                    if (err) {
-                        res.status(STATUS_CODE.ServerError).send({ err: err });
-                    } else {
-                        //there add project._id to user project list then send back response
-                        User.findByIdAndUpdate(req.user._id, { $push: { projects: project._id } }, { upsert: true, new: true }).
-                            exec(async (err, user) => {
-                                if (err) {
-                                    res.status(STATUS_CODE.ServerError).send({ err: err });
-                                } else {
-                                    //here fetch data from document file (question, [respones]) and store to database
-                                    const formate = key.split('.');
-                                    if (formate[formate.length - 1] === 'csv') {
-                                        const params = {
-                                            Bucket: process.env.AWS_DOCUMENT_BUCKET,
-                                            Key: key
-                                        }
-                                        s3.getObject(params, async (err, result) => {
-                                            if (err) {
-                                                res.status(STATUS_CODE.ServerError).send({ err });
-                                            } else {
-                                                const data = result.Body.toString("utf8").split('\r\n');
-                                                let row = [];
-                                                function saveResponse(cb) {
-                                                    for(let j=0; j<coloumns.length; j++) {
-                                                        const ele = coloumns[j];
-                                                        const questionCodebook = new Codebook({
-                                                            _id: new mongoose.Types.ObjectId()
-                                                        }).save((err, Qcodebook) => {
-                                                            if(err) {res.status(STATUS_CODE.ServerError).send(err);}
-                                                            else{
-                                                                const newQuestion = new Question({
-                                                                    _id: new mongoose.Types.ObjectId(),
-                                                                    desc: ele.question,
-                                                                    codebook:Qcodebook._id
-                                                                }).save((err, question) => {
-                                                                    if (err) {
-                                                                        return res.status(STATUS_CODE.ServerError).send({ err: err });
-                                                                    } else {
-                                                                        Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: question._id } }, { upsert: true, new: true }).
-                                                                            exec((err, project) => {
-                                                                                if (err) {
-                                                                                    return res.status(STATUS_CODE.ServerError).send({ err: err });
-                                                                                } else {
-                                                                                    let resNum = 0;
-                                                                                    for (let i = 1; i < data.length; i++) {
-                                                                                        row = data[i].split(',');
-                                                                                        if (row[ele.coloumn] === undefined || row[ele.coloumn] == '' || row[ele.coloumn] == '\r\n') {
-                                                                                            console.log('');
-                                                                                        } else {
-                                                                                            resNum++;
-                                                                                            const newResponse = new Response({
-                                                                                                _id: new mongoose.Types.ObjectId(),
-                                                                                                resNum: resNum,
-                                                                                                desc: row[ele.coloumn],
-                                                                                                length: String(row[ele.coloumn]).length,
-                                                                                                questionId: question._id
-                                                                                            }).save((err, response) => {
-                                                                                                if (err) {
-                                                                                                    res.status(STATUS_CODE.ServerError).send({ err });
-                                                                                                } else {
-                                                                                                    Question.findByIdAndUpdate(question._id, { $push: { listOfResponses: response._id } }, { upsert: true, new: true }).
-                                                                                                        exec((err, result) => {
-                                                                                                            if (err) { return res.status(STATUS_CODE.ServerError).send({ err: err }) }
-                                                                                                        });
-                                                                                                }
-                                                                                            })
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            });
-                                                                    }
-                                                                });
-                                                            }
-                                                        })
-                                                    }
-                                                    cb();
-                                                    
-                                                }
-                                                function createResponse() {
-                                                    res.status(STATUS_CODE.Created).send({ message: RESPONSE_MESSAGE.projectCreated, projectId: project._id })
-                                                }
-                                                saveResponse(createResponse);
-                                            }//eles body finish
-                                        })
-                                    } else {
-                                        res.status(STATUS_CODE.Ok).send({ message: 'only .csv file logic implement' });
-                                    }
-                                }
-                            });
-                    }
-                })
+                    resNum: resNum,
+                    desc: row[questionNumber],
+                    length: String(row[questionNumber]).length,
+                    questionId: questionId
+                }
+                responseList.push(response);
             }
+            if(count===data.length){
+                resolve();
+            }
+        }); 
+    }).then(()=>responseList).catch(err=>console.log(err));
+}
+const saveResponse = async (data, coloumns, project) => {
+    const questions = await coloumns.map(async ele => {
+        const codebookId = await createCodebook();
+        const questionId = await createQuestion(ele.question, codebookId);
+        Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
+            .exec((err, info) => {
+                if (err) console.log("Error during push question in project question list: ", err);
+            })
+        const responseArray = await fetchSomeResponse(data, ele.coloumn, questionId);
+        Response.insertMany(responseArray)
+        .then(async(doc) =>{
+            const responseIds = await doc.map(ele=>ele._id);
+            Question.findByIdAndUpdate(questionId, {$push:{listOfResponses:{$each: responseIds}}})
+            .exec((err, result)=>{
+                if(err) console.log(err);
+                return {questionId,responseArray}
+            })
         })
+        .catch((err) => console.log(err));
+    });
+    return questions;
+}
+
+module.exports = {
+    createProject: async (req, res) => {
+        const { name, desc, key, coloumns, industry, type, tags } = req.body;
+        const codebookId = await createCodebook();
+        const newProject = new Project({
+            _id: new mongoose.Types.ObjectId(),
+            name: name,
+            desc: desc,
+            docKey: key,
+            industry: industry,
+            type: type,
+            tags: tags,
+            codebook: codebookId
+        });
+        const project = await newProject.save()
+            .then(project => project)
+            .catch(err => {
+                console.log("Error during create project");
+                console.trace(err);
+            });
+        //there add project._id to user project list then send back response
+        await User.findByIdAndUpdate(req.user._id, { $push: { projects: project._id } }, { upsert: true, new: true })
+            .then(() => {
+                //here fetch data from document file (question, [respones]) and store to database
+                const formate = key.split('.');
+                if (formate[formate.length - 1] === 'csv') {
+                    const params = {
+                        Bucket: process.env.AWS_DOCUMENT_BUCKET,
+                        Key: key
+                    }
+                    s3.getObject(params, async (err, result) => {
+                        if (err) {
+                            res.status(STATUS_CODE.ServerError).send({ err });
+                        } else {
+                        const data = result.Body.toString("utf8").split('\r\n');
+                          await saveResponse(data.splice(1), coloumns, project._doc).then((results) =>{
+                                res.status(STATUS_CODE.Ok).send({message:RESPONSE_MESSAGE.projectCreated, projectId:project._id});
+                            }).catch((err) =>console.log(err));
+                        }//eles body finish
+                    })
+                } else {
+                    res.status(STATUS_CODE.Ok).send({ message: 'only .csv file logic implement' });
+                }
+            })
+            .catch(err => res.status(STATUS_CODE.ServerError).send(err));
     },
 
     projectDetails: (req, res) => {
@@ -141,7 +153,8 @@ module.exports = {
     userSearch: async (req, res) => {
         const query = req.body.userQuery;
         const limit = req.body.limit;
-        if(limit=== -1){
+        const offset = req.body.offset;
+        if (limit === -1) {
             if (query !== '') {
                 await User.find({
                     $and: [{ verified: true },
@@ -152,19 +165,20 @@ module.exports = {
                         ]
                     }]
                 },
-                (err, users) => {
-                    if (err) {
-                        logger.error(err);
-                    } else {
-                        res.status(STATUS_CODE.Ok).send(users);
+                    (err, users) => {
+                        if (err) {
+                            logger.error(err);
+                        } else {
+                            res.status(STATUS_CODE.Ok).send(users);
+                        }
                     }
-                }
                 );
             } else {
                 res.status(STATUS_CODE.Ok).send("");
             }
-        }else{
-            if(limit===undefined) limit = 20;
+        } else {
+            if (limit === undefined) limit = 20;
+            if (offset === undefined) offset = 0;
             if (query !== '') {
                 await User.find({
                     $and: [{ verified: true },
@@ -175,37 +189,38 @@ module.exports = {
                         ]
                     }]
                 },
-                {limit: limit},
-                (err, users) => {
-                    if (err) {
-                        logger.error(err);
-                    } else {
-                        res.status(STATUS_CODE.Ok).send(users);
+                    { limit: limit, skip: offset },
+                    (err, users) => {
+                        if (err) {
+                            logger.error(err);
+                        } else {
+                            res.status(STATUS_CODE.Ok).send(users);
+                        }
                     }
-                }
                 );
             } else {
                 res.status(STATUS_CODE.Ok).send("");
-            }   
+            }
         }
-            
+
     },
-    questionCodebook: (req, res)=>{
+
+    questionCodebook: (req, res) => {
         const questionId = req.body.questionId;
         Question.findById(questionId).
-        populate({
-            path:'codebook', 
-            model:'Codebook', 
-            populate:{ 
-                path: 'codewords',
-                model: 'Codeword', 
-                options: { sort: { 'key': 'asc' } },
-            }
-        }).exec((err, data) => {
-            if(err) {res.status(STATUS_CODE.ServerError).send(err);}
-            else{
-                res.status(STATUS_CODE.Ok).send({codebook:data.codebook, });
-            }
-        })
+            populate({
+                path: 'codebook',
+                model: 'Codebook',
+                populate: {
+                    path: 'codewords',
+                    model: 'Codeword',
+                    options: { sort: { 'key': 'asc' } },
+                }
+            }).exec((err, data) => {
+                if (err) { res.status(STATUS_CODE.ServerError).send(err); }
+                else {
+                    res.status(STATUS_CODE.Ok).send({ codebook: data.codebook, });
+                }
+            })
     }
 }

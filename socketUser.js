@@ -1,19 +1,19 @@
 const users = [];
 
 // Join user to editing tool
-function userJoin(id, username, room) {
+async function  userJoin(id, username, room) {
   const user = { id, username, room };
   users.push(user);
   return user;
 }
 
 // Get current user
-function getCurrentUser(id) {
+async function getCurrentUser(id) {
   return users.find(user => user.id === id);
 }
 
 // User leaves editing tool
-function userLeave(id) {
+async function  userLeave(id) {
   const index = users.findIndex(user => user.id === id);
   if (index !== -1) {
     return users.splice(index, 1)[0];
@@ -21,7 +21,7 @@ function userLeave(id) {
 }
 
 // Get room users
-function getRoomUsers(room) {
+async function getRoomUsers(room) {
   return users.filter(user => user.room === room);
 }
 

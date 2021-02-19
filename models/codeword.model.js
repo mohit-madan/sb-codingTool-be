@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const codewordSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     tag: String,
-    key: Number
+    resToAssigned:{type:Number, default: 0}
 });
 
 

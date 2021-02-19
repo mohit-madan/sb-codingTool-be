@@ -24,8 +24,8 @@ module.exports = {
                             if (user.comparePassword(password)) {
                                 //login
                                 //expires time 15 minutes
-                                const accessToken = await jwt.sign({ username }, process.env.JWT_ACCESS_KEY, { expiresIn: loginTokenExpiresIn });
-                                res.status(STATUS_CODE.Ok).send({ auth: true, accessToken: accessToken });
+                                const accessToken = jwt.sign({ username }, process.env.JWT_ACCESS_KEY, { expiresIn: loginTokenExpiresIn });
+                                res.status(STATUS_CODE.Ok).send({ auth: true, accessToken: accessToken, user:user });
                             } else {
                                 res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.passwordNotMatch });
                             }
@@ -52,8 +52,8 @@ module.exports = {
                             if (User.comparePassword(password)) {
                                 //login
                                 //expires time 15 minutes
-                                const accessToken = await jwt.sign({ username }, process.env.JWT_ACCESS_KEY, { expiresIn: loginTokenExpiresIn  });
-                                res.status(STATUS_CODE.Ok).send({ auth: true, accessToken: accessToken });
+                                const accessToken = jwt.sign({ username }, process.env.JWT_ACCESS_KEY, { expiresIn: loginTokenExpiresIn  });
+                                res.status(STATUS_CODE.Ok).send({ auth: true, accessToken: accessToken, user:user  });
                             } else {
                                 res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.passwordNotMatch});
                             }
