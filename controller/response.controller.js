@@ -1,5 +1,5 @@
 const STATUS_CODE = require('../statusCode');
-const logger = require('../logger');('../statusCode')
+const logger = require('../logger'); ('../statusCode')
 const Project = require('../models/project.model');
 const Question = require('../models/question.model');
 const Response = require('../models/response.model');
@@ -127,7 +127,7 @@ const fiterByResponseWhichHaveNotAnyCodeword = async (result) => {
 
 const applyFilter = async (result, operators) => {
     for (let i = 0; i < operators.length; i++) {
-        switch (operators[i].operator){
+        switch (operators[i].operator) {
             case 1:  //sort By Response Base On Length Asc Order
                 result = await fiterByLengthAscOrder(result);
                 break;
@@ -141,7 +141,7 @@ const applyFilter = async (result, operators) => {
                 result = await fiterByResponseDescOrder(result);
                 break;
             case 5:  //sort By Response Base On Pattern Including 
-                result = await fiterByResponsePatternMatch(operators[i].pattern, result); 
+                result = await fiterByResponsePatternMatch(operators[i].pattern, result);
                 break;
             case 6:  //sort By Response Base On ExactPattern Match
                 result = await fiterByResponsePatternExactMatch(operators[i].pattern, result);
@@ -150,13 +150,13 @@ const applyFilter = async (result, operators) => {
                 result = await fiterByResponseOnCodewordMatch(operators[i].codeword, result);
                 break;
             case 8:  //sort By Response Base On Codeword Match
-                result = await fiterByResponseOnCodewordDisMatch(operators[i].codeword, result);  
+                result = await fiterByResponseOnCodewordDisMatch(operators[i].codeword, result);
                 break;
             case 9: // sort By Response Which Have Not Any Codeword
                 result = await fiterByResponseWhichHaveNotAnyCodeword(result);
                 break;
             default: //sort By Response Base On Length Asc Order
-                result = await fiterByLengthAscOrder(result);            
+                result = await fiterByLengthAscOrder(result);
 
         }
     }
@@ -170,10 +170,6 @@ module.exports = {
     getResponse: (req, res) => {
         const id = req.body.projectId;
         const questions = req.body.questions;
-        const { pageNumber, limit } = req.params;
-        if (pageNumber == undefined) pageNumber = 1;
-        if (limit == undefined) limit = 10;
-        const start = (pageNumber - 1) * limit;
         client.get(`${id}`, async (err, data) => {
             if (err) {
                 res.status(STATUS_CODE.ServerError).send({ err });
@@ -192,8 +188,8 @@ module.exports = {
                     for (let i = 0; i < result.length; i++) {
                         response = [...response, ...result[i]];
                     }
-                    res.status(STATUS_CODE.Ok).send(response.slice(start, Number(start) + Number(limit))
-                        .map(({ resNum, desc, length, codewords }) => {
+                    res.status(STATUS_CODE.Ok).send(
+                        response.map(({ resNum, desc, length, codewords }) => {
                             return { resNum, desc, length, codewords };
                         })
                     );
@@ -225,8 +221,8 @@ module.exports = {
                                 for (let i = 0; i < result.length; i++) {
                                     response = [...response, ...result[i]];
                                 }
-                                res.status(STATUS_CODE.Ok).send(response.slice(start, Number(start) + Number(limit))
-                                    .map(({ resNum, desc, length, codewords }) => {
+                                res.status(STATUS_CODE.Ok).send(
+                                    response.map(({ resNum, desc, length, codewords }) => {
                                         return { resNum, desc, length, codewords };
                                     })
                                 );
@@ -239,49 +235,54 @@ module.exports = {
 
     operatorResponse: (req, res) => {
         const { projectId, questions, operators } = req.body;
-        const { pageNumber, limit } = req.params;
-        if (pageNumber == undefined) pageNumber = 1;
-        if (limit == undefined) limit = 10;
-        const start = (pageNumber - 1) * limit;
-        client.get(`${JSON.stringify(req.body)}`, (err, data) => {
-            if (err) res.status(STATUS_CODE.ServerError).send(err);
-            else {
-                if (data) {
-                    let totalRes;
-                    logger.info('read data from operator cache');
-                    client.get(`${projectId}`, async (err, result) => {
-                        if (result) {
-                            result = await JSON.parse(result).listOfQuestion
-                                .filter(ele => {
-                                    for (let i = 0; i < questions.length; i++) {
-                                        if (questions[i].questionId == ele._id) return true;
-                                    }
-                                    return false;
-                                }).map(ele => ele.listOfResponses);
-                            let response = [];
-                            for (let i = 0; i < result.length; i++) {
-                                response = [...response, ...result[i]];
-                            }
-                            totalRes = response.length;
-                            res.status(STATUS_CODE.Ok).send({
-                                result: JSON.parse(data).slice(start, Number(start) + Number(limit)),
-                                operatorRes: JSON.parse(data).length,
-                                totalRes,
-                            });
-                        } else {
-                            res.status(STATUS_CODE.ServerError).send({ err: "cache timeout Error" });
-                        }
-                    });
 
-                }
-                else {
-                    client.get(`${projectId}`, async (err, data) => {
-                        if (err) {
-                            res.status(STATUS_CODE.ServerError).send({ err });
-                        } else {
-                            if (data) {
-                                logger.info("fetch data from cache");
-                                let result = await JSON.parse(data).listOfQuestion
+        client.get(`${projectId}`, async (err, data) => {
+            if (err) {
+                res.status(STATUS_CODE.ServerError).send({ err });
+            } else {
+                if (data) {
+                    logger.info("fetch data from cache");
+                    let result = await JSON.parse(data).listOfQuestion
+                        .filter(ele => {
+                            for (let i = 0; i < questions.length; i++) {
+                                if (questions[i].questionId == ele._id) return true;
+                            }
+                            return false;
+                        }).map(ele => ele.listOfResponses);
+                    let response = [];
+                    for (let i = 0; i < result.length; i++) {
+                        response = [...response, ...result[i]];
+                    }
+                    result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
+                    const totalRes = result.length;
+                    const filter = applyFilter(result, operators);
+                    filter.then((filtered) => {
+                        client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(filtered));
+                        res.status(STATUS_CODE.Ok).send({
+                            result: filtered,
+                            operatorRes: filtered.length,
+                            totalRes
+                        });
+                    })
+
+                } else {
+                    logger.info("load data from database");
+                    await Project.findById(projectId).
+                        populate({
+                            path: 'listOfQuestion', model: Question,
+                            populate:
+                            {
+                                path: 'listOfResponses',
+                                model: Response,
+                                options: { sort: { 'resNum': 'asc' } },
+                                populate: { path: 'codewords', model: Codeword }
+                            }
+                        }).exec(async (err, data) => {
+                            if (err) {
+                                res.status(STATUS_CODE.ServerError).send({ err: err });
+                            } else {
+                                client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
+                                let result = await data.listOfQuestion
                                     .filter(ele => {
                                         for (let i = 0; i < questions.length; i++) {
                                             if (questions[i].questionId == ele._id) return true;
@@ -298,61 +299,16 @@ module.exports = {
                                 filter.then((filtered) => {
                                     client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(filtered));
                                     res.status(STATUS_CODE.Ok).send({
-                                        result: filtered.slice(start, Number(start) + Number(limit)),
+                                        result: filtered,
                                         operatorRes: filtered.length,
                                         totalRes
                                     });
                                 })
 
-
-                            } else {
-                                logger.info("load data from database");
-                                await Project.findById(projectId).
-                                    populate({
-                                        path: 'listOfQuestion', model: Question,
-                                        populate:
-                                        {
-                                            path: 'listOfResponses',
-                                            model: Response,
-                                            options: { sort: { 'resNum': 'asc' } },
-                                            populate: { path: 'codewords', model: Codeword }
-                                        }
-                                    }).exec(async (err, data) => {
-                                        if (err) {
-                                            res.status(STATUS_CODE.ServerError).send({ err: err });
-                                        } else {
-                                            client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
-                                            let result = await data.listOfQuestion
-                                                .filter(ele => {
-                                                    for (let i = 0; i < questions.length; i++) {
-                                                        if (questions[i].questionId == ele._id) return true;
-                                                    }
-                                                    return false;
-                                                }).map(ele => ele.listOfResponses);
-                                            let response = [];
-                                            for (let i = 0; i < result.length; i++) {
-                                                response = [...response, ...result[i]];
-                                            }
-                                            result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
-                                            const totalRes = result.length;
-                                            const filter = applyFilter(result, operators);
-                                            filter.then((filtered) => {
-                                                client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(filtered));
-                                                res.status(STATUS_CODE.Ok).send({
-                                                    result: filtered.slice(start, Number(start) + Number(limit)),
-                                                    operatorRes: filtered.length,
-                                                    totalRes
-                                                });
-                                            })
-
-                                        }
-                                    });
                             }
-                        }
-                    });
+                        });
                 }
             }
-        })
+        });
     }
-
 }

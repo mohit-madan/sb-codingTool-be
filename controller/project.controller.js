@@ -84,11 +84,13 @@ const saveResponse = async (data, coloumns, project) => {
             Question.findByIdAndUpdate(questionId, {$push:{listOfResponses:{$each: responseIds}}})
             .exec((err, result)=>{
                 if(err) console.log(err);
+                console.log("push responses");
                 return {questionId,responseArray}
             })
         })
         .catch((err) => console.log(err));
     });
+    console.log("questions: ",questions);
     return questions;
 }
 
@@ -153,7 +155,6 @@ module.exports = {
     userSearch: async (req, res) => {
         const query = req.body.userQuery;
         const limit = req.body.limit;
-        const offset = req.body.offset;
         if (limit === -1) {
             if (query !== '') {
                 await User.find({
@@ -177,8 +178,7 @@ module.exports = {
                 res.status(STATUS_CODE.Ok).send("");
             }
         } else {
-            if (limit === undefined) limit = 20;
-            if (offset === undefined) offset = 0;
+            if (limit === undefined) limit = 10;
             if (query !== '') {
                 await User.find({
                     $and: [{ verified: true },
@@ -189,7 +189,7 @@ module.exports = {
                         ]
                     }]
                 },
-                    { limit: limit, skip: offset },
+                    { limit: limit},
                     (err, users) => {
                         if (err) {
                             logger.error(err);

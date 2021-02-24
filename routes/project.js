@@ -24,10 +24,10 @@ router.post('/projectDetails', authenticateUser, projectDetails);
 router.post('/userSearch', userSearch);
 
 // getResponse in pagination
-router.post('/response/:pageNumber/:limit', getResponse);
+router.post('/response', getResponse);
 
 // operator Response in pagination
-router.post('/operator/:pageNumber/:limit', operatorResponse);
+router.post('/operator', operatorResponse);
 
 router.post('/questionCodebook', questionCodebook);
 
