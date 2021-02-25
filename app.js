@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const Question = require('./models/question.model');
 const Codebook = require('./models/codebook.model');
 const Codeword = require('./models/codeword.model');
 const Response = require('./models/response.model');
@@ -77,21 +78,22 @@ io.on('connection', socket => {
     })
 
     // Listen for operation
-    // operation = { codewordId, responses:[resNum]}
+    // operation = { codewordId, responses:[]}
     socket.on('makeOperation', async operation => {
         const user = await getCurrentUser(socket.id);
         //triger operation to connect all users to this room
         io.to(user.room).emit('operation', operation);
         //here also make change to db
-        let count;
+        let count = 0;
         let len = 0;
         new Promise(resolve => {
             operation.responses.map(ele => {
                 len++;
-                Response.findOne({ resNum: ele.resNum, questionId: user.room })
+                console.log(ele);
+                Response.findOne({ resNum: ele, questionId: user.room })
                     .exec((err, response) => {
                         if (err) {
-                            socket.emit('message', `Someting went wrong during assigned keyword to Response ${ele.responseNum}`);
+                            socket.emit('message', `Someting went wrong during assigned keyword to Response ${ele}`);
                         } else {
                             if (response.codewords.length === 0) count++;
 
@@ -99,12 +101,13 @@ io.on('connection', socket => {
                                 if (err) { console.log(err); }
                             });
                         }
+                        if (len === operation.responses.length) {
+                            resolve();
+                        }
                     })
-                if (len === operation.responses.length) {
-                    resolve();
-                }
             })
         }).then(() =>{
+            
             Question.findByIdAndUpdate(user.room, { $inc: { resOfCoded: count } }, { new: true })
                 .exec((err, question) => {
                     if (err) { console.log(err); }
