@@ -9,7 +9,7 @@ const responseSchema = new mongoose.Schema({
     lang: {type: String, Default: 'English'},
     length: Number,
     questionId:mongoose.Types.ObjectId,
-    codewords:[{type: mongoose.Schema.Types.ObjectId, ref: 'Codeword'}] //may be multiple codeword of any response
+    codewords:[{type: mongoose.Schema.Types.ObjectId, unique: true, ref: 'Codeword'}] //may be multiple codeword of any response
 });
 
 

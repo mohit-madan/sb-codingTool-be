@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const codewordSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     tag: String,
-    active: Boolean,
-    resToAssigned:{type:Number, default: 0}
+    active: { type:Boolean, default: true },
+    resToAssigned:[{type: mongoose.Schema.Types.ObjectId, unique: true}]
 });
 
 

@@ -78,11 +78,11 @@ io.on('connection', socket => {
     })
 
     // Listen for operation
-    // operation = { codewordId, responses:[]}
-    socket.on('makeOperation', async operation => {
+    //for multiple selected responses  operation = { codewordId, responses:[arrayOfResNum]}
+    socket.on('multiple-response-operation', async operation => {
         const user = await getCurrentUser(socket.id);
         //triger operation to connect all users to this room
-        io.to(user.room).emit('operation', operation);
+        io.to(user.room).emit('multiple-operation', operation);
         //here also make change to db
         let count = 0;
         let len = 0;
@@ -97,7 +97,7 @@ io.on('connection', socket => {
                         } else {
                             if (response.codewords.length === 0) count++;
 
-                            Response.findByIdAndUpdate(response._id, { $push: { codewords: operation.codewordId } }, { upsert: true }, (err, res) => {
+                            Response.findByIdAndUpdate(response._id, { $addToSet: { codewords: operation.codewordId } },(err, res) => {
                                 if (err) { console.log(err); }
                             });
                         }
@@ -106,8 +106,8 @@ io.on('connection', socket => {
                         }
                     })
             })
-        }).then(() =>{
-            
+        }).then(() => {
+
             Question.findByIdAndUpdate(user.room, { $inc: { resOfCoded: count } }, { new: true })
                 .exec((err, question) => {
                     if (err) { console.log(err); }
@@ -116,93 +116,215 @@ io.on('connection', socket => {
                         io.to(user.room).emit('question-response-coded', { resOfCoded: question.resOfCoded });
                     }
                 });
-            Codeword.findByIdAndUpdate(operation.codewordId, { $inc: { resToAssigned: operation.responses.length } }, { new: true })
+            Codeword.findByIdAndUpdate(operation.codewordId, { $addToSet: { resToAssigned: operation.responses } }, { new: true })
                 .exec((err, result) => {
                     if (err) { console.log(err); }
                     else {
                         //triger Response of Question coded to connect all users to this room
                         io.to(user.room)
                             .emit('codeword-assigned-to-response',
-                                { codewordId: result._id, resToAssigned: result.resToAssigned });
+                                { codewordId: result._id, resToAssigned: result.resToAssigned.length });
                     }
                 })
         })
     });
 
-     //Listen for Add new (codeword=>{projectCodebookId, questionCodebookId, codeword})
-     socket.on('addCodeword', async newCodeword => {
-            const user = await getCurrentUser(socket.id);
-            //here also make change to db
-            const { projectCodebookId, questionCodebookId, codeword } = newCodeword;
-            const newcodeword = new Codeword({
-                _id: new mongoose.Types.ObjectId(),
-                tag: codeword
-            }).save((err, result) => {
-                if (!err) {
-                    Codebook.findByIdAndUpdate(questionCodebookId, { $push: { codewords: result._id } }, { upsert: true }, (err, res) => {
+    //for single selected response operation = { resNum, codewordIds:[arrayOfcodewordId]}
+    socket.on('single-response-operation', async operation => {
+        const user = await getCurrentUser(socket.id);
+        //triger operation to connect all users to this room
+        io.to(user.room).emit('single-operation', operation);
+        //here also make change to db
+        let idArray = [];
+        new Promise(resolve => {
+            Response.findOne({ resNum: operation.resNum, questionId: user.room }).exec((err, response) => {
+                if (err) { console.log(err); }
+                else{
+                    idArray = response.codewords;
+                    Response.findByIdAndUpdate(response._id, { $addToSet: { codewords: operation.codewordIds} }, (err, res) => {
                         if (err) { console.log(err); }
+                        else {
+                            // console.log("response:", res);
+                            resolve();
+                        }
                     });
-                    Codebook.findByIdAndUpdate(projectCodebookId, { $push: { codewords: result._id } }, { upsert: true }, (err, res) => {
-                        if (err) { console.log(err); }
-                    });
-                    //triger add new codeword to connect all users to this room
-                    io.to(user.room).emit('add-new-codeword-to-list', { codewordId: result._id, codeword: newCodeword.codeword, codekey: newCodeword.codekey });
-                } else {
-                    socket.emit('message', 'Someting went wrong during add new codeword');
+                }
+            })
+                
+
+        }).then(async() => {
+
+            if(idArray.length === 0){
+                Question.findByIdAndUpdate(user.room, { $inc: { resOfCoded: 1 } }, { new: true })
+                .exec((err, question) => {
+                    if (err) { console.log(err); }
+                    else {
+                        //triger Response of Question coded to connect all users to this room
+                        io.to(user.room).emit('question-response-coded', { resOfCoded: question.resOfCoded });
+                    }
+                });
+            }
+            //add new codeword
+            const assigned = await operation.codewordIds.filter(id=>{
+                if(idArray.find(ele=> ele === id)===undefined){
+                    return true;
+                }else{
+                    return false;
+                }
+            })
+            console.log({assined,idArray,operation:operation.codewordIds});
+            assigned.map(assignedId=>{
+                Codeword.findByIdAndUpdate(assignedId, { $addToSet: { resToAssigned: operation.resNum } }, { new: true })
+                .exec((err, result) => {
+                    if (err) { console.log(err); }
+                    else {
+                        //triger Response of Question coded to connect all users to this room
+                        io.to(user.room)
+                            .emit('codeword-assigned-to-response',
+                                { codewordId: result._id, resToAssigned: result.resToAssigned.length });
+                    }
+                })
+            });
+            //remove old codeword
+            const deassigned = await idArray.filter(id=>{
+                if(operation.codewordIds.find(ele=> ele === id)===undefined){
+                    return true;
+                }
+                else{
+                    return false;
                 }
             });
-        });
-
-        //Listen for delete (codeword=>{codewordId})
-        socket.on('deleteCodeword', async (deleteCodeword) => {
-            const user = await getCurrentUser(socket.id);
-            //here also make change to db
-            const codewordId = deleteCodeword.codewordId;
-            Codeword.findByIdAndRemove(codewordId, (err, res) => {
-                if (err) { console.log(err); }
+            console.log({deassined,idArray,operation:operation.codewordIds});
+            deassigned.map(deassignedId=>{
+                Codeword.findByIdAndUpdate(deassignedId, { $pull: { resToAssigned: operation.resNum } }, { new: true })
+                .exec((err, result) => {
+                    if (err) { console.log(err); }
+                    else {
+                        //triger Response of Question coded to connect all users to this room
+                        io.to(user.room)
+                            .emit('codeword-assigned-to-response',
+                                { codewordId: result._id, resToAssigned: result.resToAssigned.length });
+                    }
+                })
             });
-            //triger delete codeword to connect all users to this room
-            io.to(user.room).emit('delete-codeword-to-list', deleteCodeword);
-        });
-
-        //Listen for edit (codeword=>{codeword, codewordId})
-        socket.on('editCodeword', async (editCodeword) => {
-            const user = await getCurrentUser(socket.id);
-            //here also make change to db
-            const { codeword, codewordId } = editCodeword;
-            Codeword.findByIdAndUpdate(codewordId, { $set: { tag: codeword } }, (err, res) => {
-                if (err) { console.log(err); }
-            });
-            //triger edit codeword to connect all users to this room
-            io.to(user.room).emit('edit-codeword-to-list', editCodeword);
-        });
-    })
-
-
-    //mongoose connect and set plugins
-    mongoose.connect(process.env.DB_URL,
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useCreateIndex: true,
-            useFindAndModify: false
+ 
         })
-        .then(() => logger.info('Connected to Mongo Database successfully'))
-        .catch(err => logger.error(err));
-
-    //Passport middleware
-    app.use(passport.initialize());
-    app.use(passport.session());
-
-    //routes
-    app.use('/', require('./routes/project'));
-    app.use('/', require('./routes/users'));
-    app.get('/', authenticateUser, (req, res) => {
-        res.status(200).send({ message: "Welcome at Survey Buddy", user: req.user });
     });
 
-    // define port for app
-    const port = process.env.PORT || 5000;
+    //Listen for Add new (codeword=>{projectCodebookId, questionCodebookId, codeword})
+    socket.on('addCodeword', async newCodeword => {
+        const user = await getCurrentUser(socket.id);
+        //here also make change to db
+        const { projectCodebookId, questionCodebookId, codeword } = newCodeword;
+        const newcodeword = new Codeword({
+            _id: new mongoose.Types.ObjectId(),
+            tag: codeword
+        }).save((err, result) => {
+            if (!err) {
+                Codebook.findByIdAndUpdate(questionCodebookId, { $addToSet: { codewords: result._id } }, (err, res) => {
+                    if (err) { console.log(err); }
+                });
+                Codebook.findByIdAndUpdate(projectCodebookId, { $addToSet: { codewords: result._id } },  (err, res) => {
+                    if (err) { console.log(err); }
+                });
+                //triger add new codeword to connect all users to this room
+                io.to(user.room).emit('add-new-codeword-to-list', { codewordId: result._id, codeword: newCodeword.codeword, codekey: newCodeword.codekey });
+            } else {
+                socket.emit('message', 'Someting went wrong during add new codeword');
+            }
+        });
+    });
 
-    //config listen
-    server.listen(port, () => console.log(`server is running at port: ${port}`));
+    //Listen for delete (codeword=>{codewordId})
+    socket.on('deleteCodeword', async (deleteCodeword) => {
+        const user = await getCurrentUser(socket.id);
+        //here also make change to db
+        const codewordId = deleteCodeword.codewordId;
+        Codeword.findById(codewordId,(err, codeword) => {
+            if(err) console.log(err);
+            else {
+                let count = 0;
+                new Promise(resolve =>{
+                    codeword.resToAssigned.map(resId=>{
+                        Response.findByIdAndUpdate(resId, {$pull:{codewords:codewordId}},(err, res)=>{
+                            if(err) console.log(err);
+                            count++;
+                            if(count === codewordId.resToAssigned.length){
+                                resolve();
+                            }
+                        })
+                    })
+                }).then(()=>{
+                    Codeword.findByIdAndRemove(codewordId, (err, res) => {
+                        if (err) { console.log(err); }
+                        else{
+                            //triger delete codeword to connect all users to this room
+                            io.to(user.room).emit('delete-codeword-to-list', deleteCodeword);
+                        }
+                    });
+                    
+                }).catch(err=>{
+                    console.log({err});
+                    socket.emit('message', 'Someting went wrong during delete codeword');
+                })
+                
+            }
+        })
+        
+    });
+
+    //Listen for edit (codeword=>{codeword, codewordId})
+    socket.on('editCodeword', async (editCodeword) => {
+        const user = await getCurrentUser(socket.id);
+        //here also make change to db
+        const { codeword, codewordId } = editCodeword;
+        Codeword.findByIdAndUpdate(codewordId, { $set: { tag: codeword } }, (err, res) => {
+            if (err) { console.log(err); }
+        });
+        //triger edit codeword to connect all users to this room
+        io.to(user.room).emit('edit-codeword-to-list', editCodeword);
+    });
+
+    //Listen for toggle (codeword=>{codewordId})
+    socket.on('toggleCodeword', async (toggleCodeword) => {
+        const user = await getCurrentUser(socket.id);
+        //here also make change to db
+        const codewordId = toggleCodeword.codewordId;
+        Codeword.findByIdAndUpdate(codewordId, {$set: {active: !active} },{ new: true}, (err, res) => {
+            if (err) { console.log(err); }
+            else{
+                //triger edit codeword to connect all users to this room
+                io.to(user.room).emit('toggle-codeword-to-list', {editCodeword, res});
+            }
+        });
+    });
+})
+
+
+//mongoose connect and set plugins
+mongoose.connect(process.env.DB_URL,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        useFindAndModify: false
+    })
+    .then(() => logger.info('Connected to Mongo Database successfully'))
+    .catch(err => logger.error(err));
+
+//Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+//routes
+app.use('/', require('./routes/project'));
+app.use('/', require('./routes/users'));
+app.get('/', authenticateUser, (req, res) => {
+    res.status(200).send({ message: "Welcome at Survey Buddy", user: req.user });
+});
+
+// define port for app
+const port = process.env.PORT || 5000;
+
+//config listen
+server.listen(port, () => console.log(`server is running at port: ${port}`));

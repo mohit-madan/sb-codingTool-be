@@ -3,7 +3,7 @@ const {Codeword} = require('./codeword.model');
 
 const codebookSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
-    codewords:[{type: mongoose.Schema.Types.ObjectId, ref: 'Codeword'}] 
+    codewords:[{type: mongoose.Schema.Types.ObjectId, ref: 'Codeword', unique: true}] 
 });
 
 
