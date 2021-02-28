@@ -302,15 +302,15 @@ io.on('connection', socket => {
 
 
 //mongoose connect and set plugins
-mongoose.connect(process.env.DB_URL,
+mongoose.connect('mongodb://localhost:27017/SurveyBuddy'||process.env.DB_URL,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
         useFindAndModify: false
     })
-    .then(() => logger.info('Connected to Mongo Database successfully'))
-    .catch(err => logger.error(err));
+    .then(() => console.log('Connected to Mongo Database successfully'))
+    .catch(err => console.log(err));
 
 //Passport middleware
 app.use(passport.initialize());

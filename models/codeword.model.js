@@ -4,7 +4,7 @@ const codewordSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     tag: String,
     active: { type:Boolean, default: true },
-    resToAssigned:[{type: mongoose.Schema.Types.ObjectId, unique: true}]
+    resToAssigned:[{type: mongoose.Schema.Types.ObjectId}]
 });
 
 
