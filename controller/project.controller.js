@@ -45,8 +45,8 @@ const createQuestion = async (desc, codebookId) => {
 const fetchSomeResponse = async (data, questionNumber, questionId) => {
     let resNum = 0;
     let responseList = []
-    let count=0;
-    return new Promise( (resolve) => {
+    let count = 0;
+    return new Promise((resolve) => {
         data.forEach((cr) => {
             row = cr.split(',');
             count++;
@@ -63,35 +63,38 @@ const fetchSomeResponse = async (data, questionNumber, questionId) => {
                 }
                 responseList.push(response);
             }
-            if(count===data.length){
+            if (count === data.length) {
                 resolve();
             }
-        }); 
-    }).then(()=>responseList).catch(err=>console.log(err));
+        });
+    }).then(() => responseList).catch(err => console.log(err));
 }
 const saveResponse = async (data, coloumns, project) => {
-    const questions = await coloumns.map(async ele => {
-        const codebookId = await createCodebook();
-        const questionId = await createQuestion(ele.question, codebookId);
-        Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
-            .exec((err, info) => {
-                if (err) console.log("Error during push question in project question list: ", err);
-            })
-        const responseArray = await fetchSomeResponse(data, ele.coloumn, questionId);
-        Response.insertMany(responseArray)
-        .then(async(doc) =>{
-            const responseIds = await doc.map(ele=>ele._id);
-            Question.findByIdAndUpdate(questionId, {$push:{listOfResponses:{$each: responseIds}}})
-            .exec((err, result)=>{
-                if(err) console.log(err);
-                console.log("push responses");
-                return {questionId,responseArray}
-            })
-        })
-        .catch((err) => console.log(err));
-    });
-    console.log("questions: ",questions);
-    return questions;
+    let count = 0;
+    return new Promise(resolve => {
+        coloumns.map(async ele => {
+            const codebookId = await createCodebook();
+            const questionId = await createQuestion(ele.question, codebookId);
+            Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
+                .exec((err, info) => {
+                    if (err) console.log("Error during push question in project question list: ", err);
+                })
+            const responseArray = await fetchSomeResponse(data, ele.coloumn, questionId);
+            Response.insertMany(responseArray)
+                .then(async (doc) => {
+                    const responseIds = await doc.map(ele => ele._id);
+                    Question.findByIdAndUpdate(questionId, { $push: { listOfResponses: { $each: responseIds } } })
+                        .exec((err, result) => {
+                            if (err) console.log(err);
+                            count++;
+                            if (count === coloumns.length) {
+                                resolve("Project is created successfully");
+                            }
+                        })
+                })
+                .catch((err) => console.log(err));
+        });
+    }).then((res) => res);
 }
 
 module.exports = {
@@ -128,10 +131,11 @@ module.exports = {
                         if (err) {
                             res.status(STATUS_CODE.ServerError).send({ err });
                         } else {
-                        const data = result.Body.toString("utf8").split('\r\n');
-                          await saveResponse(data.splice(1), coloumns, project._doc).then((results) =>{
-                                res.status(STATUS_CODE.Ok).send({message:RESPONSE_MESSAGE.projectCreated, projectId:project._id});
-                            }).catch((err) =>console.log(err));
+                            const data = result.Body.toString("utf8").split('\r\n');
+                            await saveResponse(data.splice(1), coloumns, project._doc).then((results) => {
+                                console.log( results);
+                                res.status(STATUS_CODE.Ok).send({ message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
+                            }).catch((err) => console.log(err));
                         }//eles body finish
                     })
                 } else {
@@ -189,7 +193,7 @@ module.exports = {
                         ]
                     }]
                 },
-                    { limit: limit},
+                    { limit: limit },
                     (err, users) => {
                         if (err) {
                             logger.error(err);
