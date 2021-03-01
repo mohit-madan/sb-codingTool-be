@@ -131,6 +131,7 @@ io.on('connection', socket => {
 
     //for single selected response operation = { resNum, codewordIds:[arrayOfcodewordId]}
     socket.on('single-response-operation', async operation => {
+        console.log(operation)
         const user = await getCurrentUser(socket.id);
         //triger operation to connect all users to this room
         io.to(user.room).emit('single-operation', operation);
@@ -172,7 +173,7 @@ io.on('connection', socket => {
                     return false;
                 }
             })
-            console.log({assined,idArray,operation:operation.codewordIds});
+            // console.log({assined,idArray,operation:operation.codewordIds});
             assigned.map(assignedId=>{
                 Codeword.findByIdAndUpdate(assignedId, { $addToSet: { resToAssigned: operation.resNum } }, { new: true })
                 .exec((err, result) => {
@@ -194,7 +195,7 @@ io.on('connection', socket => {
                     return false;
                 }
             });
-            console.log({deassined,idArray,operation:operation.codewordIds});
+            // console.log({deassined,idArray,operation:operation.codewordIds});
             deassigned.map(deassignedId=>{
                 Codeword.findByIdAndUpdate(deassignedId, { $pull: { resToAssigned: operation.resNum } }, { new: true })
                 .exec((err, result) => {
@@ -246,10 +247,11 @@ io.on('connection', socket => {
                 let count = 0;
                 new Promise(resolve =>{
                     codeword.resToAssigned.map(resId=>{
-                        Response.findByIdAndUpdate(resId, {$pull:{codewords:codewordId}},(err, res)=>{
+                        console.log("resNum:",resId);
+                        Response.updateOne({resNum:resId,questionId:user.room}, {$pull:{codewords:codewordId}},(err, res)=>{
                             if(err) console.log(err);
                             count++;
-                            if(count === codewordId.resToAssigned.length){
+                            if(count === codeword.resToAssigned.length){
                                 resolve();
                             }
                         })
@@ -290,11 +292,11 @@ io.on('connection', socket => {
         const user = await getCurrentUser(socket.id);
         //here also make change to db
         const codewordId = toggleCodeword.codewordId;
-        Codeword.findByIdAndUpdate(codewordId, {$set: {active: !active} },{ new: true}, (err, res) => {
+        Codeword.findByIdAndUpdate(codewordId, {$set: {active:toggleCodeword.status} },{ new: true}, (err, res) => {
             if (err) { console.log(err); }
             else{
                 //triger edit codeword to connect all users to this room
-                io.to(user.room).emit('toggle-codeword-to-list', {editCodeword, res});
+                io.to(user.room).emit('toggle-codeword-to-list', toggleCodeword);
             }
         });
     });

@@ -157,8 +157,8 @@ module.exports = {
     },
 
     userSearch: async (req, res) => {
-        const query = req.body.userQuery;
-        const limit = req.body.limit;
+        let query = req.body.userQuery;
+        let limit = req.body.limit;
         if (limit === -1) {
             if (query !== '') {
                 await User.find({
