@@ -1,21 +1,7 @@
-{"message":"load data from database","level":"info","timestamp":"2021-03-01T13:08:27.514Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-03-01T16:58:24.805Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T16:58:48.858Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T16:59:22.499Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:02:22.607Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:03:26.373Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:09:34.651Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:10:45.379Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:15:14.422Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:15:54.912Z"}
-{"message":"load data from database","level":"info","timestamp":"2021-03-01T17:30:33.322Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:38:30.828Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:47:38.197Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:50:08.807Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:53:19.723Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:57:09.239Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T17:59:13.552Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T18:04:58.955Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T18:06:46.808Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T18:11:07.920Z"}
-{"message":"fetch data from cache","level":"info","timestamp":"2021-03-01T18:12:14.721Z"}
+{"message":"load data from database and update cache","level":"info","timestamp":"2021-03-02T12:14:14.392Z"}
+{"message":"load data from database and update cache","level":"info","timestamp":"2021-03-02T12:14:35.423Z"}
+{"message":"load data from database and update cache","level":"info","timestamp":"2021-03-02T12:16:35.038Z"}
+{"message":"fetch data from cache","level":"info","timestamp":"2021-03-02T12:17:19.974Z"}
+{"message":"fetch data from cache","level":"info","timestamp":"2021-03-02T12:18:15.224Z"}
+{"message":"fetch data from cache","level":"info","timestamp":"2021-03-02T12:18:19.545Z"}
+{"message":"fetch data from cache","level":"info","timestamp":"2021-03-02T12:18:31.479Z"}

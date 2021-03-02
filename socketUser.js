@@ -1,8 +1,8 @@
 const users = [];
 
 // Join user to editing tool
-async function  userJoin(id, username, room) {
-  const user = { id, username, room };
+async function  userJoin(id, username, room, projectId) {
+  const user = { id, username, room, projectId };
   users.push(user);
   return user;
 }

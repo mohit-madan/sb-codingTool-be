@@ -17,6 +17,9 @@ const {
     userLeave,
     getRoomUsers
 } = require('./socketUser');
+const client = require('./config/redis.config');
+const { cacheTimeFullProject} = require('./constant');
+
 // create own app
 const app = express();
 
@@ -41,8 +44,8 @@ io.on('connection', socket => {
 
     console.log("user connected");
     //user connect
-    socket.on('joinRoom', async ({ username, room }) => {
-        const user = await userJoin(socket.id, username, room);
+    socket.on('joinRoom', async ({ username, room, projectId }) => {
+        const user = await userJoin(socket.id, username, room, projectId);
 
         socket.join(user.room);
         // simple emit a message(emit to single user who is connecting)
@@ -81,6 +84,8 @@ io.on('connection', socket => {
     //for multiple selected responses  operation = { codewordId, responses:[arrayOfResNum]}
     socket.on('multiple-response-operation', async operation => {
         const user = await getCurrentUser(socket.id);
+        //update status of cache update
+        client.setex(`${user.projectId}=>status`, cacheTimeFullProject,'true');
         //triger operation to connect all users to this room
         io.to(user.room).emit('multiple-operation', operation);
         //here also make change to db
@@ -133,6 +138,8 @@ io.on('connection', socket => {
     socket.on('single-response-operation', async operation => {
         console.log(operation)
         const user = await getCurrentUser(socket.id);
+         //update status of cache update
+         client.setex(`${user.projectId}=>status`, cacheTimeFullProject,'true');
         //triger operation to connect all users to this room
         io.to(user.room).emit('single-operation', operation);
         //here also make change to db
@@ -215,6 +222,8 @@ io.on('connection', socket => {
     //Listen for Add new (codeword=>{projectCodebookId, questionCodebookId, codeword})
     socket.on('addCodeword', async newCodeword => {
         const user = await getCurrentUser(socket.id);
+        //update status of cache update
+        client.setex(`${user.projectId}=>status`, cacheTimeFullProject,'true');
         //here also make change to db
         const { projectCodebookId, questionCodebookId, codeword } = newCodeword;
         const newcodeword = new Codeword({
@@ -239,6 +248,8 @@ io.on('connection', socket => {
     //Listen for delete (codeword=>{codewordId})
     socket.on('deleteCodeword', async (deleteCodeword) => {
         const user = await getCurrentUser(socket.id);
+        //update status of cache update
+        client.setex(`${user.projectId}=>status`, cacheTimeFullProject,'true');
         //here also make change to db
         const codewordId = deleteCodeword.codewordId;
         Codeword.findById(codewordId,(err, codeword) => {
@@ -278,6 +289,8 @@ io.on('connection', socket => {
     //Listen for edit (codeword=>{codeword, codewordId})
     socket.on('editCodeword', async (editCodeword) => {
         const user = await getCurrentUser(socket.id);
+        //update status of cache update
+        client.setex(`${user.projectId}=>status`, cacheTimeFullProject,'true');
         //here also make change to db
         const { codeword, codewordId } = editCodeword;
         Codeword.findByIdAndUpdate(codewordId, { $set: { tag: codeword } }, (err, res) => {
@@ -290,6 +303,8 @@ io.on('connection', socket => {
     //Listen for toggle (codeword=>{codewordId})
     socket.on('toggleCodeword', async (toggleCodeword) => {
         const user = await getCurrentUser(socket.id);
+        //update status of cache update
+        client.setex(`${user.projectId}=>status`, cacheTimeFullProject,'true');
         //here also make change to db
         const codewordId = toggleCodeword.codewordId;
         Codeword.findByIdAndUpdate(codewordId, {$set: {active:toggleCodeword.status} },{ new: true}, (err, res) => {

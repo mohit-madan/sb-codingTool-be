@@ -5,11 +5,7 @@ const Question = require('../models/question.model');
 const Response = require('../models/response.model');
 const Codeword = require('../models/codeword.model');
 const { cacheTimeFullProject, cacheTimeForFilter } = require('../constant');
-//initialize cache
-const REDIS_PORT = process.env.PORT || 6379;
-const redis = require('redis');
-const client = redis.createClient(REDIS_PORT);
-client.on('error', err => console.error(err));
+const client = require('../config/redis.config');
 
 function ASC(a, b) {
     if (a.desc < b.desc) {
@@ -164,70 +160,97 @@ const applyFilter = async (result, operators) => {
 }
 
 
+const fetchProjectDataFromDatabase = async (projectId) => {
+    return new Promise(resolve => {
+        Project.findById(projectId).
+            populate({
+                path: 'listOfQuestion', model: Question,
+                populate:
+                {
+                    path: 'listOfResponses',
+                    model: Response,
+                    options: { sort: { 'resNum': 'asc' } },
+                    populate: { path: 'codewords', model: Codeword }
+                }
+            }).exec(async (err, data) => {
+                if (err) {
+                    console.log({ err: err });
+                } else {
+                    console.log("fetchProjectDataFromDatabase", data.listOfQuestion.length);
+                    resolve(data);
+                }
+            })
+    });
+}
+
+const fetchQuestionsResponse = async (data, questions) => {
+    const result = await data.listOfQuestion
+        .filter(ele => {
+            for (let i = 0; i < questions.length; i++) {
+                if (questions[i].questionId == ele._id) return true;
+            }
+            return false;
+        }).map(ele => ele.listOfResponses);
+    let response = [];
+    return new Promise(resolve => {
+        for (let i = 0; i < result.length; i++) {
+            response = [...response, ...result[i]];    
+        }
+        resolve(response);
+    }).then((response) => response)
+}
 
 module.exports = {
 
     getResponse: (req, res) => {
-        const id = req.body.projectId;
+        const projectId = req.body.projectId;
         const questions = req.body.questions;
-        client.get(`${id}`, async (err, data) => {
+        client.get(`${projectId}`, async (err, data) => {
             if (err) {
                 res.status(STATUS_CODE.ServerError).send({ err });
             } else {
                 if (data) {
-                    logger.info("fetch data from cache");
-                    const result = await JSON.parse(data).listOfQuestion
-                        .filter(ele => {
-                            for (let i = 0; i < questions.length; i++) {
-                                if (questions[i].questionId == ele._id)
-                                    return true;
-                            }
-                            return false;
-                        }).map(ele => ele.listOfResponses);
-                    let response = [];
-                    for (let i = 0; i < result.length; i++) {
-                        response = [...response, ...result[i]];
-                    }
-                    res.status(STATUS_CODE.Ok).send(
-                        response.map(({ resNum, desc, length, codewords }) => {
-                            return { resNum, desc, length, codewords };
-                        })
-                    );
-                } else {
-                    logger.info("load data from database");
-                    await Project.findById(id).
-                        populate({
-                            path: 'listOfQuestion', model: Question,
-                            populate:
-                            {
-                                path: 'listOfResponses',
-                                model: Response,
-                                options: { sort: { 'resNum': 'asc' } },
-                                populate: { path: 'codewords', model: Codeword }
-                            }
-                        }).exec(async (err, data) => {
-                            if (err) {
-                                res.status(STATUS_CODE.ServerError).send({ err: err });
+                    client.get(`${projectId}=>status`, async (err, status) => {
+                        if (err) { res.status(STATUS_CODE.ServerError).send({ err }); }
+                        else {
+                            if (status === 'false') {
+                                logger.info("fetch data from cache");
+                                const response = await fetchQuestionsResponse(JSON.parse(data), questions);
+                                res.status(STATUS_CODE.Ok).send(
+                                    response.map(({ resNum, desc, length, codewords }) => {
+                                        return { resNum, desc, length, codewords };
+                                    })
+                                );
                             } else {
-                                client.setex(`${id}`, cacheTimeFullProject, JSON.stringify(data));
-                                const result = await data.listOfQuestion
-                                    .filter(ele => {
-                                        for (let i = 0; i < questions.length; i++) {
-                                            if (questions[i].questionId == ele._id) return true;
-                                        }
-                                        return false;
-                                    }).map(ele => ele.listOfResponses);
-                                let response = [];
-                                for (let i = 0; i < result.length; i++) {
-                                    response = [...response, ...result[i]];
-                                }
+                                //data fetch from database and update cache
+                                logger.info("load data from database and update cache");
+                                //update status of cache update
+                                client.setex(`${projectId}=>status`, cacheTimeFullProject, 'false');
+                                const data = await fetchProjectDataFromDatabase(projectId);
+                                client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
+                                const response = await fetchQuestionsResponse(data, questions);
                                 res.status(STATUS_CODE.Ok).send(
                                     response.map(({ resNum, desc, length, codewords }) => {
                                         return { resNum, desc, length, codewords };
                                     })
                                 );
                             }
-                        });
+                        }
+                    })
+                } else {
+                    //data fetch from database and update cache
+                    logger.info("first time load data from database");
+                    //update status of cache update
+                    client.setex(`${projectId}=>status`, cacheTimeFullProject, 'false');
+                    const data = await fetchProjectDataFromDatabase(projectId);
+                    client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
+                    const response = await fetchQuestionsResponse(data, questions);
+                    console.log({response});
+                    res.status(STATUS_CODE.Ok).send(
+                        response.map(({ resNum, desc, length, codewords }) => {
+                            return { resNum, desc, length, codewords };
+                        })
+                    );
                 }
             }
         });
@@ -241,18 +264,53 @@ module.exports = {
                 res.status(STATUS_CODE.ServerError).send({ err });
             } else {
                 if (data) {
-                    logger.info("fetch data from cache");
-                    let result = await JSON.parse(data).listOfQuestion
-                        .filter(ele => {
-                            for (let i = 0; i < questions.length; i++) {
-                                if (questions[i].questionId == ele._id) return true;
+                    client.get(`${projectId}=>status`, async (err, status) => {
+                        if (err) { res.status(STATUS_CODE.ServerError).send({ err }); }
+                        else {
+                            if (status === 'false') {
+                                logger.info("fetch data from cache");
+                                const response = await fetchQuestionsResponse(JSON.parse(data), questions);
+                                result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
+                                const totalRes = result.length;
+                                const filter = applyFilter(result, operators);
+                                filter.then((filtered) => {
+                                    res.status(STATUS_CODE.Ok).send({
+                                        result: filtered,
+                                        operatorRes: filtered.length,
+                                        totalRes
+                                    });
+                                })
+                            } else {
+                                //data fetch from database and update cache
+                                logger.info("load data from database and update cache for filter");
+                                //update status of cache update
+                                client.setex(`${projectId}=>status`, cacheTimeFullProject, 'false');
+                                const data = await fetchProjectDataFromDatabase(projectId);
+                                client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
+                                const response = await fetchQuestionsResponse(data, questions);
+                                result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
+                                const totalRes = result.length;
+                                const filter = applyFilter(result, operators);
+                                filter.then((filtered) => {
+                                    res.status(STATUS_CODE.Ok).send({
+                                        result: filtered,
+                                        operatorRes: filtered.length,
+                                        totalRes
+                                    });
+                                })
                             }
-                            return false;
-                        }).map(ele => ele.listOfResponses);
-                    let response = [];
-                    for (let i = 0; i < result.length; i++) {
-                        response = [...response, ...result[i]];
-                    }
+                        }
+                    });
+
+
+                } else {
+                    //data fetch from database and update cache
+                    logger.info("first time load data from database for filter");
+                    //update status of cache update
+                    client.setex(`${projectId}=>status`, cacheTimeFullProject, 'false');
+                    const data = await fetchProjectDataFromDatabase(projectId);
+                    client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
+                    const response = await fetchQuestionsResponse(data, questions);
                     result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
                     const totalRes = result.length;
                     const filter = applyFilter(result, operators);
@@ -264,49 +322,6 @@ module.exports = {
                             totalRes
                         });
                     })
-
-                } else {
-                    logger.info("load data from database");
-                    await Project.findById(projectId).
-                        populate({
-                            path: 'listOfQuestion', model: Question,
-                            populate:
-                            {
-                                path: 'listOfResponses',
-                                model: Response,
-                                options: { sort: { 'resNum': 'asc' } },
-                                populate: { path: 'codewords', model: Codeword }
-                            }
-                        }).exec(async (err, data) => {
-                            if (err) {
-                                res.status(STATUS_CODE.ServerError).send({ err: err });
-                            } else {
-                                client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
-                                let result = await data.listOfQuestion
-                                    .filter(ele => {
-                                        for (let i = 0; i < questions.length; i++) {
-                                            if (questions[i].questionId == ele._id) return true;
-                                        }
-                                        return false;
-                                    }).map(ele => ele.listOfResponses);
-                                let response = [];
-                                for (let i = 0; i < result.length; i++) {
-                                    response = [...response, ...result[i]];
-                                }
-                                result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
-                                const totalRes = result.length;
-                                const filter = applyFilter(result, operators);
-                                filter.then((filtered) => {
-                                    client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(filtered));
-                                    res.status(STATUS_CODE.Ok).send({
-                                        result: filtered,
-                                        operatorRes: filtered.length,
-                                        totalRes
-                                    });
-                                })
-
-                            }
-                        });
                 }
             }
         });
