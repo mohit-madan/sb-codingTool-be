@@ -248,6 +248,7 @@ io.on('connection', socket => {
     //Listen for delete (codeword=>{codewordId})
     socket.on('deleteCodeword', async (deleteCodeword) => {
         const user = await getCurrentUser(socket.id);
+        let responses;
         //update status of cache update
         client.setex(`${user.projectId}=>status`, cacheTimeFullProject,'true');
         //here also make change to db
@@ -256,6 +257,7 @@ io.on('connection', socket => {
             if(err) console.log(err);
             else {
                 let count = 0;
+                responses = codeword.resToAssigned;
                 new Promise(resolve =>{
                     codeword.resToAssigned.map(resId=>{
                         console.log("resNum:",resId);
@@ -272,7 +274,7 @@ io.on('connection', socket => {
                         if (err) { console.log(err); }
                         else{
                             //triger delete codeword to connect all users to this room
-                            io.to(user.room).emit('delete-codeword-to-list', deleteCodeword);
+                            io.to(user.room).emit('delete-codeword-to-list', {codewordId, responses});
                         }
                     });
                     
@@ -311,7 +313,8 @@ io.on('connection', socket => {
             if (err) { console.log(err); }
             else{
                 //triger edit codeword to connect all users to this room
-                io.to(user.room).emit('toggle-codeword-to-list', toggleCodeword);
+                const response =res.resToAssigned;
+                io.to(user.room).emit('toggle-codeword-to-list', {codewordId, response});
             }
         });
     });
