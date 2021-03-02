@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { authenticateUser } = require('../auth_config/auth');
 const {uploadFile, deleteFile, getFile} = require('../controller/documentFile.controller');
-const {createProject, projectDetails, userSearch, questionCodebook} = require('../controller/project.controller');
+const {createProject, projectDetails, questionCodebook} = require('../controller/project.controller');
 const {getResponse, operatorResponse} = require('../controller/response.controller');
+const {userSearch, projectList} = require('../controller/dashBoard.controller');
 
 //upload project document file
 router.post('/uploadFile', authenticateUser, uploadFile );
@@ -29,6 +30,10 @@ router.post('/response', getResponse);
 // operator Response in pagination
 router.post('/operator', operatorResponse);
 
+//get codebook of question
 router.post('/questionCodebook', questionCodebook);
+
+//get user all projects list
+router.post('/projectList', authenticateUser, projectList);
 
 module.exports = router;

@@ -3,7 +3,6 @@ const Project = require('../models/project.model');
 const Question = require('../models/question.model');
 const Response = require('../models/response.model');
 const Codebook = require('../models/codebook.model');
-const Codeword = require('../models/codeword.model');
 const STATUS_CODE = require('../statusCode')
 const logger = require('../logger')
 const RESPONSE_MESSAGE = require('../responseMessage')
@@ -155,60 +154,6 @@ module.exports = {
             }
         })
     },
-
-    userSearch: async (req, res) => {
-        let query = req.body.userQuery;
-        let limit = req.body.limit;
-        if (limit === -1) {
-            if (query !== '') {
-                await User.find({
-                    $and: [{ verified: true },
-                    {
-                        $or: [
-                            { name: { "$regex": query, "$options": 'i' } },
-                            { email: { "$regex": query, "$options": 'i' } }
-                        ]
-                    }]
-                },
-                    (err, users) => {
-                        if (err) {
-                            logger.error(err);
-                        } else {
-                            res.status(STATUS_CODE.Ok).send(users);
-                        }
-                    }
-                );
-            } else {
-                res.status(STATUS_CODE.Ok).send("");
-            }
-        } else {
-            if (limit === undefined) limit = 10;
-            if (query !== '') {
-                await User.find({
-                    $and: [{ verified: true },
-                    {
-                        $or: [
-                            { name: { "$regex": query, "$options": 'i' } },
-                            { email: { "$regex": query, "$options": 'i' } }
-                        ]
-                    }]
-                },
-                    { limit: limit },
-                    (err, users) => {
-                        if (err) {
-                            logger.error(err);
-                        } else {
-                            res.status(STATUS_CODE.Ok).send(users);
-                        }
-                    }
-                );
-            } else {
-                res.status(STATUS_CODE.Ok).send("");
-            }
-        }
-
-    },
-
     questionCodebook: (req, res) => {
         const questionId = req.body.questionId;
         Question.findById(questionId).
