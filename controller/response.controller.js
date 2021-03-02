@@ -82,15 +82,21 @@ const fiterByResponsePatternExactMatch = async (pattern, result) => {
 }
 
 const fiterByResponseOnCodewordMatch = async (codeword, result) => {
-    return await result.filter(({ resNum, desc, length, codewords }) => {
+    let temp1=[]
+    const filterFunction=({ resNum, desc, length, codewords }) => {
         var regExp = new RegExp("^" + codeword + "$", 'i');
         if (codewords.length > 0) {
             codewords.map(it => {
-                if (it.tag.search(regExp) != -1) return true; //match return true
+                console.log(it.tag);
+                if (it.tag.search(regExp) != -1) {
+                    temp1.push({ resNum, desc, length, codewords })
+                }//match return true
             })
         }
-        return false; // return false codewodrs empty
-    }).map(({ resNum, desc, length, codewords }) => {
+        return false;
+    }
+    await result.map(filterFunction)
+    return temp1.map(({ resNum, desc, length, codewords }) => {
         return { resNum, desc, length, codewords };
     })
 }
@@ -104,7 +110,9 @@ const fiterByResponseOnCodewordDisMatch = async (codeword, result) => {
             })
             return true; //given codeword not exists in all codewords return true
         }
-        return false; // return false codewodrs empty
+        else{
+            return false; // return false codewodrs empty
+        }
     }).map(({ resNum, desc, length, codewords }) => {
         return { resNum, desc, length, codewords };
     })
@@ -115,7 +123,9 @@ const fiterByResponseWhichHaveNotAnyCodeword = async (result) => {
         if (codewords.length === 0) {
             return true
         }
-        return false;
+        else{
+            return false;
+        }
     }).map(({ resNum, desc, length, codewords }) => {
         return { resNum, desc, length, codewords };
     })
@@ -156,6 +166,7 @@ const applyFilter = async (result, operators) => {
 
         }
     }
+    console.log({result});
     return result;
 }
 
