@@ -2,6 +2,4 @@ node_modules/
 .DS_Store
 .env
 .vscode
-coding-main-backend-info.log
-coding-main-backend-err.log
 logs
