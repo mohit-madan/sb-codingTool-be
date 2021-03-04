@@ -1,21 +1,29 @@
 const winston = require('winston');
+const path = require('path');
+const __base = path.resolve(__dirname, '..');
+require('winston-daily-rotate-file');
 
-// ./Logs${new Date().toLocaleDateString()}/coding-main-backend${new Date().toLocaleDateString()}${new Date().toLocaleTimeString()}.log
+
 const logger = winston.createLogger({
-    transports:[
-        new winston.transports.File({
-            level: 'info', 
-            filename: `coding-main-backend-info.log`,
+    transports: [
+        new winston.transports.DailyRotateFile({
+            level: 'info',
+            filename: `${__base}/logs/info`,
             json: true,
+            colorize: true,
+            datePattern: 'DD-MM-YYYY',
             format: winston.format.combine(winston.format.timestamp(), winston.format.json())
         }),
-        new winston.transports.File({
-            level: 'error', 
-            filename: `coding-main-backend-err.log`,
+        new winston.transports.DailyRotateFile({
+            level: 'error',
+            filename: `${__base}/logs/error`,
             json: true,
+            colorize: true,
+            datePattern: 'DD-MM-YYYY',
             format: winston.format.combine(winston.format.timestamp(), winston.format.json())
         })
     ]
-})
+});
+
 
 module.exports = logger;

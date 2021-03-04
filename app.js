@@ -343,8 +343,11 @@ mongoose.connect('mongodb://localhost:27017/SurveyBuddy' || process.env.DB_URL,
         useCreateIndex: true,
         useFindAndModify: false
     })
-    .then(() => console.log('Connected to Mongo Database successfully'))
-    .catch(err => console.log(err));
+    .then(() => {
+        console.log('Connected to Mongo Database successfully');
+        logger.info('Connected to Mongo Database successfully');
+    })
+    .catch (err => console.log(err));
 
 //Passport middleware
 app.use(passport.initialize());
@@ -361,4 +364,7 @@ app.get('/', authenticateUser, (req, res) => {
 const port = process.env.PORT || 5000;
 
 //config listen
-server.listen(port, () => console.log(`server is running at port: ${port}`));
+server.listen(port, () => {
+    console.log(`server is running at port: ${port}`);
+    logger.info(`server is running at port: ${port}`);
+});

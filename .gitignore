@@ -4,3 +4,4 @@ node_modules/
 .vscode
 coding-main-backend-info.log
 coding-main-backend-err.log
+logs
