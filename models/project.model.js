@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const {Question} = require('./question.model');
-const {User} = require('./user.model');
-const {Codebook} = require('./codebook.model');
+const Question = require('./question.model');
+const User = require('./user.model');
+const Codebook = require('./codebook.model');
 
 const projectSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,

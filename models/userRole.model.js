@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Permission} = require('./permission.model');
+const Permission = require('./permission.model');
 
 const userRoleSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,

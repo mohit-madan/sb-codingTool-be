@@ -3,6 +3,7 @@ const Project = require('../models/project.model');
 const Question = require('../models/question.model');
 const Response = require('../models/response.model');
 const Codebook = require('../models/codebook.model');
+const Category = require('../models/category.model');
 const STATUS_CODE = require('../statusCode')
 const logger = require('../logger')
 const RESPONSE_MESSAGE = require('../responseMessage')
@@ -26,11 +27,26 @@ const createCodebook = async () => {
     return codebook._id;
 }
 
-const createQuestion = async (desc, codebookId) => {
+const createRoot = async () => {
+    const newRoot = new Category({
+        _id: new mongoose.Types.ObjectId(),
+        name: 'root'
+    });
+    const root = await newRoot.save()
+    .then(root => root)
+    .catch(err => {
+        console.log("Error during create root category");
+        console.trace(err);
+    });
+    return root._id;
+}
+
+const createQuestion = async (desc, codebookId, rootId) => {
     const newQuestion = new Question({
         _id: new mongoose.Types.ObjectId(),
         desc: desc,
-        codebook: codebookId
+        codebook: codebookId,
+        structure:rootId
     });
     const question = await newQuestion.save()
         .then(question => question)
@@ -73,7 +89,8 @@ const saveResponse = async (data, coloumns, project) => {
     return new Promise(resolve => {
         coloumns.map(async ele => {
             const codebookId = await createCodebook();
-            const questionId = await createQuestion(ele.question, codebookId);
+            const rootId = await createRoot();
+            const questionId = await createQuestion(ele.question, codebookId, rootId);
             Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
                 .exec((err, info) => {
                     if (err) console.log("Error during push question in project question list: ", err);

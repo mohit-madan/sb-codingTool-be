@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const {UserRole} = require('./userRole.model');
-const {Project} = require('./project.model');
+const UserRole = require('./userRole.model');
+const Project = require('./project.model');
 const userSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     googleId: String, 

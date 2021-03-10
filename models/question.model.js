@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
-const {Response} = require('./response.model');
-const {Codebook} = require('./codebook.model');
+const Response = require('./response.model');
+const Codebook = require('./codebook.model');
+const Category = require('./category.model');
+const Codeword = require('./codeword.model');
 
 const questionSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
@@ -8,7 +10,8 @@ const questionSchema = new mongoose.Schema({
     listOfResponses:[{type: mongoose.Schema.Types.ObjectId, ref: 'Response'}],
     resOfCoded: {type:Number, default: 0},
     //codebook relative Quetion
-    codebook:{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'}
+    codebook:{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'},
+    structure:{type: mongoose.Schema.Types.ObjectId, ref: 'Category'}
 });
 
 

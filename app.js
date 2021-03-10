@@ -9,6 +9,7 @@ const Question = require('./models/question.model');
 const Codebook = require('./models/codebook.model');
 const Codeword = require('./models/codeword.model');
 const Response = require('./models/response.model');
+const Category = require('./models/category.model');
 const { authenticateUser } = require('./auth_config/auth');
 const logger = require('./logger');
 const {
@@ -44,8 +45,8 @@ io.on('connection', socket => {
 
     console.log("user connected");
     //user connect
-    socket.on('joinRoom', async ({ username, room, projectId }) => {
-        const user = await userJoin(socket.id, username, room, projectId);
+    socket.on('joinRoom', async ({ username, room, projectId, rootId }) => {
+        const user = await userJoin(socket.id, username, room, projectId, rootId);
 
         socket.join(user.room);
         // simple emit a message(emit to single user who is connecting)
@@ -225,7 +226,8 @@ io.on('connection', socket => {
         //update status of cache update
         client.setex(`${user.projectId}=>status`, cacheTimeFullProject, 'true');
         //here also make change to db
-        const { projectCodebookId, questionCodebookId, codeword } = newCodeword;
+        const { projectCodebookId, questionCodebookId, codeword, categoryId } = newCodeword;
+        if(categoryId === undefined) categoryId = user.rootId;
         const newcodeword = new Codeword({
             _id: new mongoose.Types.ObjectId(),
             tag: codeword
@@ -237,6 +239,9 @@ io.on('connection', socket => {
                 Codebook.findByIdAndUpdate(projectCodebookId, { $addToSet: { codewords: result._id } }, (err, res) => {
                     if (err) { console.log(err); }
                 });
+                Category.findByIdAndUpdate(categoryId, { $addToSet: { codewords: result._id } },(err, res)=>{
+                    if(err) { console.log(err); }
+                })
                 //triger add new codeword to connect all users to this room
                 io.to(user.room).emit('add-new-codeword-to-list', { codewordId: result._id, codeword: newCodeword.codeword, codekey: newCodeword.codekey });
             } else {
@@ -332,6 +337,29 @@ io.on('connection', socket => {
             }
         });
     });
+
+    //listen for create category 
+    socket.on('createCategory', async (newCategory) => {
+        const user = await getCurrentUser(socket.id);
+        const {category, parent} = newCategory;
+        const newCat = new Category({
+            _id: new mongoose.Types.ObjectId(),
+            name: category,
+            parent: parent
+        }).save((err, res) => {
+            if(err) { console.log(err)}
+            else{
+                console.log("res in create category:", res);
+                io.to(user.room).emit('create-category-to-list', {res});
+            }
+        })
+    });
+    //listen for all node structures
+    socket.on('node-structure', async (rootId) => {
+        const user = await getCurrentUser(socket.id);
+        const tree = await rootId.getChildrenTree({populate:'codewords'});
+        io.to(user.room).emit('node-structure-to-list', {tree});
+    })
 })
 
 
@@ -347,7 +375,8 @@ mongoose.connect('mongodb://localhost:27017/SurveyBuddy' || process.env.DB_URL,
         console.log('Connected to Mongo Database successfully');
         logger.info('Connected to Mongo Database successfully');
     })
-    .catch (err => console.log(err));
+
+    .catch(err => console.log(err));
 
 //Passport middleware
 app.use(passport.initialize());

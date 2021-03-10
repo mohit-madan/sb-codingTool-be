@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Codeword} = require('./codeword.model');
+const Codeword = require('./codeword.model');
 
 const responseSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
