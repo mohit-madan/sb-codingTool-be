@@ -9,7 +9,7 @@ const Question = require('./models/question.model');
 const Codebook = require('./models/codebook.model');
 const Codeword = require('./models/codeword.model');
 const Response = require('./models/response.model');
-const Category = require('./models/category.model');
+const Folder = require('./models/folder.model');
 const { authenticateUser } = require('./auth_config/auth');
 const logger = require('./logger');
 const {
@@ -47,7 +47,7 @@ io.on('connection', socket => {
     //user connect
     socket.on('joinRoom', async ({ username, room, projectId, rootId }) => {
         const user = await userJoin(socket.id, username, room, projectId, rootId);
-
+        console.log("rootId",{rootId})
         socket.join(user.room);
         // simple emit a message(emit to single user who is connecting)
         // socket.emit('message', 'Welcome to Survey Buddy');  
@@ -226,12 +226,13 @@ io.on('connection', socket => {
         //update status of cache update
         client.setex(`${user.projectId}=>status`, cacheTimeFullProject, 'true');
         //here also make change to db
-        const { projectCodebookId, questionCodebookId, codeword, categoryId } = newCodeword;
-        if(categoryId === undefined) categoryId = user.rootId;
+        const { projectCodebookId, questionCodebookId, codeword,rootId } = newCodeword;
+        // if(categoryId === undefined) categoryId = user.rootId;
+        
         const newcodeword = new Codeword({
             _id: new mongoose.Types.ObjectId(),
             tag: codeword
-        }).save((err, result) => {
+        }).save(async (err, result) => {
             if (!err) {
                 Codebook.findByIdAndUpdate(questionCodebookId, { $addToSet: { codewords: result._id } }, (err, res) => {
                     if (err) { console.log(err); }
@@ -239,11 +240,25 @@ io.on('connection', socket => {
                 Codebook.findByIdAndUpdate(projectCodebookId, { $addToSet: { codewords: result._id } }, (err, res) => {
                     if (err) { console.log(err); }
                 });
-                Category.findByIdAndUpdate(categoryId, { $addToSet: { codewords: result._id } },(err, res)=>{
+                Folder.findByIdAndUpdate(rootId, { $push: { codewords: result._id } } ,{new:true}, (err, res)=>{
                     if(err) { console.log(err); }
+                    else{
+                        console.log('add-new-codeword-to-list-resp',res)
+                    }
                 })
+                // Folder.findById(rootId, (err, res)=>{
+                //     if(err) { console.log(err); }
+                //     else{
+                //         console.log("rootId",rootId)
+                //         console.log('2nd log --->add-new-codeword-to-list-resp',res)
+                //     }
+                // })
+                const tree = await Folder.getChildrenTree({filters:{_id:rootId},populate:'codewords'});
                 //triger add new codeword to connect all users to this room
                 io.to(user.room).emit('add-new-codeword-to-list', { codewordId: result._id, codeword: newCodeword.codeword, codekey: newCodeword.codekey });
+                io.to(user.room).emit('node-structure-to-list', {tree});
+                console.log({tree});
+            
             } else {
                 socket.emit('message', 'Someting went wrong during add new codeword');
             }
@@ -342,7 +357,8 @@ io.on('connection', socket => {
     socket.on('createCategory', async (newCategory) => {
         const user = await getCurrentUser(socket.id);
         const {category, parent} = newCategory;
-        const newCat = new Category({
+        console.log("parent",parent)
+        const newCat = new Folder({
             _id: new mongoose.Types.ObjectId(),
             name: category,
             parent: parent
@@ -350,6 +366,13 @@ io.on('connection', socket => {
             if(err) { console.log(err)}
             else{
                 console.log("res in create category:", res);
+                console.log("rootId==>: ",user.roodId,parent);
+                Folder.findByIdAndUpdate(parent,{$push:{children:res._id}},{new:true},(err1,res1)=>{
+                    if(err1) console.log(err1);
+                    else{
+                            console.log("Force fully added to childer: ",res1);
+                    }
+                })
                 io.to(user.room).emit('create-category-to-list', {res});
             }
         })
@@ -357,7 +380,8 @@ io.on('connection', socket => {
     //listen for all node structures
     socket.on('node-structure', async (rootId) => {
         const user = await getCurrentUser(socket.id);
-        const tree = await rootId.getChildrenTree({populate:'codewords'});
+        const tree = await Folder.getChildrenTree({filters:{_id:rootId},populate:'codewords'});
+
         io.to(user.room).emit('node-structure-to-list', {tree});
     })
 })

@@ -3,7 +3,7 @@ const Project = require('../models/project.model');
 const Question = require('../models/question.model');
 const Response = require('../models/response.model');
 const Codebook = require('../models/codebook.model');
-const Category = require('../models/category.model');
+const Folder = require('../models/folder.model');
 const STATUS_CODE = require('../statusCode')
 const logger = require('../logger')
 const RESPONSE_MESSAGE = require('../responseMessage')
@@ -28,7 +28,7 @@ const createCodebook = async () => {
 }
 
 const createRoot = async () => {
-    const newRoot = new Category({
+    const newRoot = new Folder({
         _id: new mongoose.Types.ObjectId(),
         name: 'root'
     });
@@ -186,7 +186,8 @@ module.exports = {
             }).exec((err, data) => {
                 if (err) { res.status(STATUS_CODE.ServerError).send(err); }
                 else {
-                    res.status(STATUS_CODE.Ok).send({ codebook: data.codebook, });
+                    // res.status(STATUS_CODE.Ok).send({ codebook: data.codebook, });
+                    res.status(STATUS_CODE.Ok).send({ codebook: data.codebook, rootId:data.structure });
                 }
             })
     }

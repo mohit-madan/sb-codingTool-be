@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const MpathPlugin = require('mongoose-mpath');
 const Codeword = require('./codeword.model');
 
-const categorySchema = new mongoose.Schema({
+const folderSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     name: String,
     codewords: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Codeword' }]
 });
 // add plugin
-categorySchema.plugin(MpathPlugin);
+folderSchema.plugin(MpathPlugin);
 
-const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);
-module.exports = Category;
+const Folder = mongoose.models.Folder || mongoose.model('Folder', folderSchema);
+module.exports = Folder;

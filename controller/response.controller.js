@@ -332,7 +332,7 @@ module.exports = {
                             operatorRes: filtered.length,
                             totalRes
                         });
-                    })
+                    }).catch(err=>console.log(err))
                 }
             }
         });

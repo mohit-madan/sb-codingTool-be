@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Response = require('./response.model');
 const Codebook = require('./codebook.model');
-const Category = require('./category.model');
+const Folder = require('./folder.model');
 const Codeword = require('./codeword.model');
 
 const questionSchema = new mongoose.Schema({
@@ -11,7 +11,7 @@ const questionSchema = new mongoose.Schema({
     resOfCoded: {type:Number, default: 0},
     //codebook relative Quetion
     codebook:{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'},
-    structure:{type: mongoose.Schema.Types.ObjectId, ref: 'Category'}
+    structure:{type: mongoose.Schema.Types.ObjectId, ref: 'Folder'}
 });
 
 
