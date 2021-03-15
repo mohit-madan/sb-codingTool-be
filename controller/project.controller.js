@@ -33,11 +33,11 @@ const createRoot = async () => {
         name: 'root'
     });
     const root = await newRoot.save()
-    .then(root => root)
-    .catch(err => {
-        console.log("Error during create root category");
-        console.trace(err);
-    });
+        .then(root => root)
+        .catch(err => {
+            console.log("Error during create root category");
+            console.trace(err);
+        });
     return root._id;
 }
 
@@ -46,7 +46,7 @@ const createQuestion = async (desc, codebookId, rootId) => {
         _id: new mongoose.Types.ObjectId(),
         desc: desc,
         codebook: codebookId,
-        structure:rootId
+        structure: rootId
     });
     const question = await newQuestion.save()
         .then(question => question)
@@ -115,7 +115,7 @@ const saveResponse = async (data, coloumns, project) => {
 
 module.exports = {
     createProject: async (req, res) => {
-        const { name, desc, key, coloumns, industry, type, tags } = req.body;
+        const { name, desc, key, coloumns, industry, type, tags, assignedTo } = req.body;
         const codebookId = await createCodebook();
         const newProject = new Project({
             _id: new mongoose.Types.ObjectId(),
@@ -125,8 +125,10 @@ module.exports = {
             industry: industry,
             type: type,
             tags: tags,
-            codebook: codebookId
+            codebook: codebookId,
+            assignedTo: assignedTo
         });
+        //here call to assined
         const project = await newProject.save()
             .then(project => project)
             .catch(err => {
@@ -149,7 +151,7 @@ module.exports = {
                         } else {
                             const data = result.Body.toString("utf8").split('\r\n');
                             await saveResponse(data.splice(1), coloumns, project._doc).then((results) => {
-                                console.log( results);
+                                console.log(results);
                                 res.status(STATUS_CODE.Ok).send({ message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
                             }).catch((err) => console.log(err));
                         }//eles body finish
@@ -163,7 +165,9 @@ module.exports = {
 
     projectDetails: (req, res) => {
         const id = req.body.id;
-        Project.findById(id, (err, project) => {
+        Project.findById(id).
+        populate({path:'listOfQuestion', model:'Question', select:'desc'}).
+        exec((err, project) => {
             if (err) {
                 res.status(STATUS_CODE.ServerError).send({ err: err });
             } else {
@@ -172,22 +176,36 @@ module.exports = {
         })
     },
 
-    questionCodebook: (req, res) => {
+    leftMenu: (req, res) => {
         const questionId = req.body.questionId;
         Question.findById(questionId).
-            populate({
+            populate([{
                 path: 'codebook',
                 model: 'Codebook',
                 populate: {
                     path: 'codewords',
                     model: 'Codeword',
-                    options: { sort: { 'key': 'asc' } },
+                    options: { sort: { 'tag': 'asc' } },
                 }
-            }).exec((err, data) => {
-                if (err) { res.status(STATUS_CODE.ServerError).send(err); }
+            }, {
+                path: 'root',
+                model: 'Folder', 
+                populate: {
+                    path: 'codewords',
+                    model: 'Codeword',
+                    options: { sort: { 'tag': 'asc' } },
+                }
+            }]).exec((err, data) => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
                 else {
-                    // res.status(STATUS_CODE.Ok).send({ codebook: data.codebook, });
-                    res.status(STATUS_CODE.Ok).send({ codebook: data.codebook, rootId:data.structure });
+                    const codewords = data.codebook.codewords;
+                    const root = data.root;
+                    const tree = [...codewords, ...root];
+                    const questionCodebookId = data.codebook._id;
+                    res.status(STATUS_CODE.Ok).send({ tree, questionCodebookId });
                 }
             })
     }

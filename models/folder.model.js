@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const MpathPlugin = require('mongoose-mpath');
+// const MpathPlugin = require('mongoose-mpath');
 const Codeword = require('./codeword.model');
 
 const folderSchema = new mongoose.Schema({
@@ -8,7 +8,7 @@ const folderSchema = new mongoose.Schema({
     codewords: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Codeword' }]
 });
 // add plugin
-folderSchema.plugin(MpathPlugin);
+// folderSchema.plugin(MpathPlugin);
 
 const Folder = mongoose.models.Folder || mongoose.model('Folder', folderSchema);
 module.exports = Folder;

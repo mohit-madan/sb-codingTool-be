@@ -166,7 +166,7 @@ const applyFilter = async (result, operators) => {
 
         }
     }
-    console.log({result});
+    // console.log({result});
     return result;
 }
 

@@ -19,6 +19,7 @@
     "jsonwebtoken": "^8.5.1",
     "mailgun-js": "^0.22.0",
     "mongoose": "^5.11.12",
+    "mongoose-materialized": "^0.2.0",
     "mongoose-mpath": "^2.4.4",
     "multer": "^1.4.2",
     "multiparty": "^4.2.2",

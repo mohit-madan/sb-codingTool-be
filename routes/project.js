@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { authenticateUser } = require('../auth_config/auth');
 const {uploadFile, deleteFile, getFile} = require('../controller/documentFile.controller'); 
-const {createProject, projectDetails, questionCodebook} = require('../controller/project.controller');
+const {createProject, projectDetails, leftMenu} = require('../controller/project.controller');
 const {getResponse, operatorResponse} = require('../controller/response.controller');
 const {userSearch, projectList} = require('../controller/dashBoard.controller');
 
@@ -31,12 +31,10 @@ router.post('/response', getResponse);
 router.post('/operator', operatorResponse);
 
 //get codebook of question
-router.post('/questionCodebook', questionCodebook);
-//get list of all project
-router.post('/projectList', authenticateUser, projectList);
+router.post('/leftMenu', leftMenu);
 
 //get user all projects list
-router.post('/projectList', authenticateUser, projectList);
+router.get('/projectList', authenticateUser, projectList);
 //add projectList
 
 module.exports = router;
