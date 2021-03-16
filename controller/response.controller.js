@@ -256,7 +256,7 @@ module.exports = {
                     const data = await fetchProjectDataFromDatabase(projectId);
                     client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
                     const response = await fetchQuestionsResponse(data, questions);
-                    console.log({response});
+                    // console.log({response});
                     res.status(STATUS_CODE.Ok).send(
                         response.map(({ resNum, desc, length, codewords }) => {
                             return { resNum, desc, length, codewords };

@@ -27,26 +27,12 @@ const createCodebook = async () => {
     return codebook._id;
 }
 
-const createRoot = async () => {
-    const newRoot = new Folder({
-        _id: new mongoose.Types.ObjectId(),
-        name: 'root'
-    });
-    const root = await newRoot.save()
-        .then(root => root)
-        .catch(err => {
-            console.log("Error during create root category");
-            console.trace(err);
-        });
-    return root._id;
-}
 
-const createQuestion = async (desc, codebookId, rootId) => {
+const createQuestion = async (desc, codebookId) => {
     const newQuestion = new Question({
         _id: new mongoose.Types.ObjectId(),
         desc: desc,
-        codebook: codebookId,
-        structure: rootId
+        codebook: codebookId
     });
     const question = await newQuestion.save()
         .then(question => question)
@@ -89,8 +75,7 @@ const saveResponse = async (data, coloumns, project) => {
     return new Promise(resolve => {
         coloumns.map(async ele => {
             const codebookId = await createCodebook();
-            const rootId = await createRoot();
-            const questionId = await createQuestion(ele.question, codebookId, rootId);
+            const questionId = await createQuestion(ele.question, codebookId);
             Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
                 .exec((err, info) => {
                     if (err) console.log("Error during push question in project question list: ", err);
