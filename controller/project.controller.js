@@ -98,9 +98,10 @@ const saveResponse = async (data, coloumns, project) => {
     }).then((res) => res);
 }
 
+
 module.exports = {
     createProject: async (req, res) => {
-        const { name, desc, key, coloumns, industry, type, tags, assignedTo } = req.body;
+        const { name, desc, key, coloumns, industry, type, tags } = req.body;
         const codebookId = await createCodebook();
         const newProject = new Project({
             _id: new mongoose.Types.ObjectId(),
@@ -109,17 +110,22 @@ module.exports = {
             docKey: key,
             industry: industry,
             type: type,
-            tags: tags,
             codebook: codebookId,
-            assignedTo: assignedTo
+            CreatedBy: req.user._id,
+            assignedTo: tags
         });
-        //here call to assined
         const project = await newProject.save()
             .then(project => project)
             .catch(err => {
                 console.log("Error during create project");
                 console.trace(err);
             });
+        //assigned projects to user
+        tags.map(userId => {
+            User.findByIdAndUpdate(userId, { $push: { projects: project._id } }, { upsert: true }, (err, res1) => {
+                if (err) console.log(err);
+            })
+        });
         //there add project._id to user project list then send back response
         await User.findByIdAndUpdate(req.user._id, { $push: { projects: project._id } }, { upsert: true, new: true })
             .then(() => {
@@ -151,7 +157,7 @@ module.exports = {
     projectDetails: (req, res) => {
         const id = req.body.id;
         Project.findById(id).
-            // populate({path:'listOfQuestion', model:'Question', select:'desc'}).
+            populate({path:'listOfQuestion', model:'Question', select:'desc'}).
             exec((err, project) => {
                 if (err) {
                     res.status(STATUS_CODE.ServerError).send({ err: err });
@@ -186,17 +192,17 @@ module.exports = {
                 }
             }]).
             exec((err, data) => {
-                if (err) { 
+                if (err) {
                     console.log(err);
                     res.status(STATUS_CODE.ServerError).send({ err: err });
-                 }
+                }
                 else {
-                        // console.log(data);
-                        const questionCodebookId = data.codebook._id;
-                        const codewords = data.codebook.codewords;
-                        const tree = [...data.rootCodebook, ...data.root,]
-                        res.status(STATUS_CODE.Ok).send({ tree, questionCodebookId, codewords });
-                    
+                    // console.log(data);
+                    const questionCodebookId = data.codebook._id;
+                    const codewords = data.codebook.codewords;
+                    const tree = [...data.rootCodebook, ...data.root,]
+                    res.status(STATUS_CODE.Ok).send({ tree, questionCodebookId, codewords });
+
 
                 }
             })

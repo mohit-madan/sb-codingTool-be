@@ -6,10 +6,10 @@ module.exports = {
     projectList: (req, res)=>{
         const userId = req.user._id;
         User.findById(userId)
-        .populate({
+        .populate([{
             path:'projects', 
-            model:Project
-        }).exec((err,result)=>{
+            model: 'Project'
+        }]).exec((err,result)=>{
             if(err)  res.status(STATUS_CODE.ServerError).send({ err: err });
             else{
                 res.status(STATUS_CODE.Ok).send(result.projects);
