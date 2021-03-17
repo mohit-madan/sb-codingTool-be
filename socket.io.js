@@ -15,29 +15,30 @@ const { cacheTimeFullProject } = require('./constant');
 
 
 const findStructure = async (user) => {
-    let tree = [];
     new Promise(resolve => {
         Question.findById(user.room).
-            populate({
+            populate([{
                 path: 'root',
-                model: 'Folder'
-            }).
+                model: 'Folder', 
+                populate: {
+                    path: 'codewords',
+                    model: 'Codeword',
+                    options: { sort: { 'tag': 'asc' } },
+                }
+            }, {
+                path: 'rootCodebook',
+                model: 'Codeword',
+                options: { sort: { 'tag': 'asc' } },
+            }]).
             exec((err, res) => {
                 if (err) { console.log(err); }
                 else {
-                    if (res) { tree = [...tree, ...res.root] }
-                    Codebook.findById(user.questionCodebookId).
-                        populate({
-                            path: 'codewords',
-                            model: 'Codeword',
-                            options: { sort: { 'key': 'asc' } },
-                        }).exec((err, res1) => {
-                            if (err) { console.log(err) }
-                            else {
-                                if (res1) { tree = [...tree, ...res1.codewords]; }
-                                resolve(tree);
-                            }
-                        })
+                    if (res) { 
+                        console.log("infun", res);
+                        const tree = [...res.rootCodebook, ...res.root,] 
+                        resolve(tree);
+                    }
+                    
                 }
             })
     }).then(tree => {
@@ -102,7 +103,6 @@ module.exports = (io) => {
             new Promise(resolve => {
                 operation.responses.map(ele => {
                     len++;
-                    console.log(ele);
                     Response.findOne({ resNum: ele, questionId: user.room })
                         .exec((err, response) => {
                             if (err) {
@@ -142,6 +142,63 @@ module.exports = (io) => {
             })
         });
 
+        //for multiple selected responses  operation = { codewordId, responses:[arrayOfResNum]}
+        socket.on('multiple-response-removal-operation', async operation => {
+            const user = await getCurrentUser(socket.id);
+            //update status of cache update
+            client.setex(`${user.projectId}=>status`, cacheTimeFullProject, 'true');
+            //triger operation to connect all users to this room
+            io.to(user.room).emit('multiple-removal-operation', operation);
+            //here also make change to db
+            let count = 0;
+            let len = 0;
+            new Promise(resolve => {
+                operation.responses.map(ele => {
+                    len++;
+                    // console.log(ele);
+                    Response.findOne({ resNum: ele, questionId: user.room })
+                        .exec((err, response) => {
+                            if (err) {
+                                socket.emit('message', `Someting went wrong during assigned keyword to Response ${ele}`);
+                            } else {
+                                if (response.codewords.find(ele => ele == operation.codewordId) !== undefined && response.codewords.length === 1) {
+                                    count++;
+                                }
+                                Response.findByIdAndUpdate(response._id, { $pull: { codewords: operation.codewordId } }, (err, res) => {
+                                    if (err) { console.log(err); }
+                                });
+                            }
+                            if (len === operation.responses.length) {
+                                resolve();
+                            }
+                        })
+                    Codeword.findByIdAndUpdate(operation.codewordId, { $pull: { resToAssigned: ele } }, (err, res) => {
+                        if (err) console.log(err);
+                    })
+                }).then(() => {
+
+                    Question.findByIdAndUpdate(user.room, { $inc: { resOfCoded: -count } }, { new: true })
+                        .exec((err, question) => {
+                            if (err) { console.log(err); }
+                            else {
+                                //triger Response of Question coded to connect all users to this room
+                                io.to(user.room).emit('question-response-coded', { resOfCoded: question.resOfCoded });
+                            }
+                        });
+                    Codeword.findById(operation.codewordId)
+                        .exec((err, result) => {
+                            if (err) { console.log(err); }
+                            else {
+                                //triger Response of Question coded to connect all users to this room
+                                io.to(user.room)
+                                    .emit('codeword-assigned-to-response',
+                                        { codewordId: result._id, resToAssigned: result.resToAssigned.length });
+                            }
+                        })
+                })
+            });
+        });
+
         //for single selected response operation = { resNum, codewordIds:[arrayOfcodewordId]}
         socket.on('single-response-operation', async operation => {
             console.log(operation)
@@ -157,7 +214,7 @@ module.exports = (io) => {
                     if (err) { console.log(err); }
                     else {
                         idArray = response.codewords;
-                        Response.findByIdAndUpdate(response._id, { $addToSet: { codewords: operation.codewordIds } }, (err, res) => {
+                        Response.findByIdAndUpdate(response._id, { $addToSet: { codewords: { $each: operation.codewordIds } } }, (err, res) => {
                             if (err) { console.log(err); }
                             else {
                                 // console.log("response:", res);
@@ -227,15 +284,14 @@ module.exports = (io) => {
             })
         });
 
-        //Listen for Add new (codeword=>{projectCodebookId, questionCodebookId, codeword})
+        //Listen for Add new (codeword=>{projectCodebookId, codeword})
         socket.on('addCodeword', async newCodeword => {
             const user = await getCurrentUser(socket.id);
             //update status of cache update
             console.log({ user });
             client.setex(`${user.projectId}=>status`, cacheTimeFullProject, 'true');
             //here also make change to db
-            const { projectCodebookId, codeword } = newCodeword;
-            // if(categoryId === undefined) categoryId = user.rootId;
+            const { projectCodebookId, codeword, categoryId } = newCodeword;
             const newcodeword = new Codeword({
                 _id: new mongoose.Types.ObjectId(),
                 tag: codeword
@@ -247,6 +303,15 @@ module.exports = (io) => {
                     Codebook.findByIdAndUpdate(projectCodebookId, { $addToSet: { codewords: result._id } }, (err, res) => {
                         if (err) { console.log(err); }
                     });
+                    if (categoryId === undefined) {
+                        Question.findByIdAndUpdate(user.room, { $addToSet: { rootCodebook: result._id } }, (err, res) => {
+                            if (err) { console.log(err); }
+                        });
+                    } else {
+                        Folder.findByIdAndUpdate(categoryId, { $addToSet: { codewords: result._id } }, (err, res) => {
+                            if (err) { console.log(err) }
+                        });
+                    }
                     //triger add new codeword to connect all users to this room
                     io.to(user.room).emit('add-new-codeword-to-list', { codewordId: result._id, codeword: newCodeword.codeword, codekey: newCodeword.codekey });
                     io.to(user.room).emit('root', findStructure(user));
@@ -348,20 +413,37 @@ module.exports = (io) => {
 
         //Listen for codeword add to category (assinedCodeword=>{codewordId, categoryId})
         socket.on('assingedCodeword', async (assingedCodeword) => {
-            const { codewordId, categoryId } = assingedCodeword;
             const user = await getCurrentUser(socket.id);
-            Codebook.findByIdAndUpdate(user.questionCodebookId, { $pull: { codewords: codewordId } }, (err, res) => {
+            const { codewordId, categoryId } = assingedCodeword;
+            Question.findByIdAndUpdate(user.room, { $pull: { rootCodeword: codewordId } }, (err, res) => {
                 if (err) { console.log(err) }
                 else {
-                    Folder.findByIdAndUpdate(categoryId, { $push: { codewords: codewordId } }, (err, res) => {
+                    Folder.findByIdAndUpdate(categoryId, { $addToSet: { codewords: codewordId } }, (err, res) => {
                         if (err) { console.log(err) }
                         else {
                             io.to(user.room).emit('root', findStructure(user));
                         }
-                    })
+                    });
                 }
             })
         });
+     
+         //Listen for codeword move  category1 to category2 (assinedCodeword=>{codewordId, categoryId1, categoryId2})
+        socket.on('moveCodeword', async(moveCodeword)=>{
+            const user = await getCurrentUser(socket.id);
+            const { codewordId, categoryId1, categoryId2} = moveCodeword;
+            Folder.findByIdAndUpdate(categoryId1, { $pull: { codewords: codewordId } }, (err, res) => {
+                if (err) { console.log(err) }
+                else {
+                    Folder.findByIdAndUpdate(categoryId2, { $addToSet: { codewords: codewordId } }, (err, res) => {
+                        if (err) { console.log(err) }
+                        else {
+                            io.to(user.room).emit('root', findStructure(user));
+                        }
+                    });
+                }
+            });
+        })
 
         //listen for create category 
         socket.on('createCategory', async (newCategory) => {

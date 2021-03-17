@@ -11,6 +11,8 @@ const questionSchema = new mongoose.Schema({
     resOfCoded: {type:Number, default: 0},
     //codebook relative Quetion
     codebook:{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'},
+    //root codewords
+    rootCodebook:[{type: mongoose.Schema.Types.ObjectId, ref:'Codeword'}],
     root:[{type: mongoose.Schema.Types.ObjectId, ref: 'Folder'}]
 });
 

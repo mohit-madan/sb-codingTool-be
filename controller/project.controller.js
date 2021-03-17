@@ -151,20 +151,32 @@ module.exports = {
     projectDetails: (req, res) => {
         const id = req.body.id;
         Project.findById(id).
-        populate({path:'listOfQuestion', model:'Question', select:'desc'}).
-        exec((err, project) => {
-            if (err) {
-                res.status(STATUS_CODE.ServerError).send({ err: err });
-            } else {
-                res.status(STATUS_CODE.Ok).send({ project: project });
-            }
-        })
+            // populate({path:'listOfQuestion', model:'Question', select:'desc'}).
+            exec((err, project) => {
+                if (err) {
+                    res.status(STATUS_CODE.ServerError).send({ err: err });
+                } else {
+                    res.status(STATUS_CODE.Ok).send({ project: project });
+                }
+            })
     },
 
     leftMenu: (req, res) => {
         const questionId = req.body.questionId;
         Question.findById(questionId).
             populate([{
+                path: 'root',
+                model: 'Folder',
+                populate: {
+                    path: 'codewords',
+                    model: 'Codeword',
+                    options: { sort: { 'tag': 'asc' } },
+                }
+            }, {
+                path: 'rootCodebook',
+                model: 'Codeword',
+                options: { sort: { 'tag': 'asc' } },
+            }, {
                 path: 'codebook',
                 model: 'Codebook',
                 populate: {
@@ -172,26 +184,22 @@ module.exports = {
                     model: 'Codeword',
                     options: { sort: { 'tag': 'asc' } },
                 }
-            }, {
-                path: 'root',
-                model: 'Folder', 
-                populate: {
-                    path: 'codewords',
-                    model: 'Codeword',
-                    options: { sort: { 'tag': 'asc' } },
-                }
-            }]).exec((err, data) => {
-                if (err) {
+            }]).
+            exec((err, data) => {
+                if (err) { 
                     console.log(err);
-                    reject(err);
-                }
+                    res.status(STATUS_CODE.ServerError).send({ err: err });
+                 }
                 else {
-                    const codewords = data.codebook.codewords;
-                    const root = data.root;
-                    const tree = [...codewords, ...root];
-                    const questionCodebookId = data.codebook._id;
-                    res.status(STATUS_CODE.Ok).send({ tree, questionCodebookId });
+                        // console.log(data);
+                        const questionCodebookId = data.codebook._id;
+                        const codewords = data.codebook.codewords;
+                        const tree = [...data.rootCodebook, ...data.root,]
+                        res.status(STATUS_CODE.Ok).send({ tree, questionCodebookId, codewords });
+                    
+
                 }
             })
+
     }
 }
