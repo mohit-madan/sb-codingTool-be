@@ -414,40 +414,87 @@ module.exports = (io) => {
             });
         });
 
-        //Listen for codeword add to category (assinedCodeword=>{codewordId, categoryId})
+        //Listen for codeword add to category (assinedCodeword=>{codewordId, categoryId, categoryName})
         socket.on('assingedCodeword', async (assingedCodeword) => {
             const user = await getCurrentUser(socket.id);
-            const { codewordId, categoryId } = assingedCodeword;
-            Question.findByIdAndUpdate(user.room, { $pull: { rootCodeword: codewordId } }, (err, res) => {
-                if (err) { console.log(err) }
-                else {
-                    Folder.findByIdAndUpdate(categoryId, { $addToSet: { codewords: codewordId } },async(err, res) => {
-                        if (err) { console.log(err) }
-                        else {
-                            const Tree = await findStructure(user)
-                            console.log({ Tree });
-                            io.to(user.room).emit('root', Tree);
-                        }
-                    });
-                }
-            })
+            const codewordId = assingedCodeword.codewordId;
+            const categoryId = assingedCodeword.categoryId;
+            const categoryName = assingedCodeword.categoryName;
+            if(cotegoryId!==undefined){
+                Question.findByIdAndUpdate(user.room, { $pull: { rootCodeword: codewordId } }, (err, res) => {
+                    if (err) { console.log(err) }
+                    else {
+                        Folder.findByIdAndUpdate(categoryId, { $addToSet: { codewords: codewordId } },async(err, res) => {
+                            if (err) { console.log(err) }
+                            else {
+                                const Tree = await findStructure(user)
+                                console.log({ Tree });
+                                io.to(user.room).emit('root', Tree);
+                            }
+                        });
+                    }
+                })
+            }else{
+                const newCategory = new Folder({
+                    _id: new mongoose.Types.ObjectId(),
+                    name: categoryName
+                }).save(async (err, category) => {
+                    if (err) { console.log(err) }
+                    else {
+                        Folder.findByIdAndUpdate(category._id, { $addToSet: { codewords: codewordId } }, async(err, res) => {
+                            if (err) { console.log(err) }
+                            else {
+                                const Tree = await findStructure(user)
+                                console.log({ Tree });
+                                io.to(user.room).emit('root', Tree);
+                            }
+                        });
+                    }
+                });
+            }
         });
 
-        //Listen for codeword move  category1 to category2 (assinedCodeword=>{codewordId, categoryId1, categoryId2})
+        //Listen for codeword move  category1 to category2 (assinedCodeword=>{codewordId, categoryId1, categoryId2, categoryName})
         socket.on('moveCodeword', async (moveCodeword) => {
             const user = await getCurrentUser(socket.id);
-            const { codewordId, categoryId1, categoryId2 } = moveCodeword;
+            // const { codewordId, categoryId1, categoryId2 } = moveCodeword;
+            const codewordId = moveCodeword.codewordId;
+            const categoryId1 = moveCodeword.categoryId1;
+            const categoryId2 = moveCodeword.categoryId2;
+            const categoryName = moveCodeword.categoryName;
             Folder.findByIdAndUpdate(categoryId1, { $pull: { codewords: codewordId } }, (err, res) => {
                 if (err) { console.log(err) }
                 else {
-                    Folder.findByIdAndUpdate(categoryId2, { $addToSet: { codewords: codewordId } }, async(err, res) => {
-                        if (err) { console.log(err) }
-                        else {
-                            const Tree = await findStructure(user)
-                            console.log({ Tree });
-                            io.to(user.room).emit('root', Tree);
-                        }
-                    });
+                    if(categoryId2!==undefined){
+                        Folder.findByIdAndUpdate(categoryId2, 
+                            { $addToSet: { codewords: codewordId } }, async(err, res) => {
+                            if (err) { console.log(err) }
+                            else {
+                                const Tree = await findStructure(user)
+                                console.log({ Tree });
+                                io.to(user.room).emit('root', Tree);
+                            }
+                        });
+                    }
+                    else{
+                        const newCategory = new Folder({
+                            _id: new mongoose.Types.ObjectId(),
+                            name: categoryName
+                        }).save(async (err, category) => {
+                            if (err) { console.log(err) }
+                            else {
+                                Folder.findByIdAndUpdate(category._id, 
+                                    { $addToSet: { codewords: codewordId } }, async(err, res) => {
+                                    if (err) { console.log(err) }
+                                    else {
+                                        const Tree = await findStructure(user)
+                                        console.log({ Tree });
+                                        io.to(user.room).emit('root', Tree);
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
             });
         })
