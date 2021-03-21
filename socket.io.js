@@ -420,10 +420,10 @@ module.exports = (io) => {
             const codewordId = assingedCodeword.codewordId;
             const categoryId = assingedCodeword.categoryId;
             const categoryName = assingedCodeword.categoryName;
-            if(cotegoryId!==undefined){
-                Question.findByIdAndUpdate(user.room, { $pull: { rootCodeword: codewordId } }, (err, res) => {
-                    if (err) { console.log(err) }
-                    else {
+            Question.findByIdAndUpdate(user.room, { $pull: { rootCodeword: codewordId } }, (err, res) => {
+                if (err) { console.log(err) }
+                else {
+                    if(categoryId!==undefined){
                         Folder.findByIdAndUpdate(categoryId, { $addToSet: { codewords: codewordId } },async(err, res) => {
                             if (err) { console.log(err) }
                             else {
@@ -433,25 +433,27 @@ module.exports = (io) => {
                             }
                         });
                     }
-                })
-            }else{
-                const newCategory = new Folder({
-                    _id: new mongoose.Types.ObjectId(),
-                    name: categoryName
-                }).save(async (err, category) => {
-                    if (err) { console.log(err) }
-                    else {
-                        Folder.findByIdAndUpdate(category._id, { $addToSet: { codewords: codewordId } }, async(err, res) => {
+                    else{
+                        const newCategory = new Folder({
+                            _id: new mongoose.Types.ObjectId(),
+                            name: categoryName
+                        }).save(async (err, category) => {
                             if (err) { console.log(err) }
                             else {
-                                const Tree = await findStructure(user)
-                                console.log({ Tree });
-                                io.to(user.room).emit('root', Tree);
+                                Folder.findByIdAndUpdate(category._id, { $addToSet: { codewords: codewordId } }, async(err, res) => {
+                                    if (err) { console.log(err) }
+                                    else {
+                                        const Tree = await findStructure(user)
+                                        console.log({ Tree });
+                                        io.to(user.room).emit('root', Tree);
+                                    }
+                                });
                             }
                         });
                     }
-                });
-            }
+                    
+                }
+            })
         });
 
         //Listen for codeword move  category1 to category2 (assinedCodeword=>{codewordId, categoryId1, categoryId2, categoryName})
