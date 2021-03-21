@@ -157,7 +157,7 @@ module.exports = {
     projectDetails: (req, res) => {
         const id = req.body.id;
         Project.findById(id).
-            populate({path:'listOfQuestion', model:'Question', select:'desc'}).
+            // populate({path:'listOfQuestion', model:'Question', select:'desc'}).
             exec((err, project) => {
                 if (err) {
                     res.status(STATUS_CODE.ServerError).send({ err: err });
