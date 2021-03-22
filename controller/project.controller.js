@@ -201,8 +201,12 @@ module.exports = {
                     const questionCodebookId = data.codebook._id;
                     const codewords = data.codebook.codewords;
                     const tree = [...data.rootCodebook, ...data.root,]
-                    res.status(STATUS_CODE.Ok).send({ tree, questionCodebookId, codewords });
 
+                    console.log("data.codebook-->",data.codebook);
+                    
+                    console.log({codewords})
+
+                    res.status(STATUS_CODE.Ok).send({ tree, questionCodebookId, codewords });
 
                 }
             })
