@@ -326,6 +326,7 @@ module.exports = {
                     const totalRes = result.length;
                     const filter = applyFilter(result, operators);
                     filter.then((filtered) => {
+                        console.log("hihisf",req.body);
                         client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(filtered));
                         res.status(STATUS_CODE.Ok).send({
                             result: filtered,

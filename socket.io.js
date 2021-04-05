@@ -389,7 +389,8 @@ module.exports = (io) => {
                                 Response.updateOne({ resNum: resId, questionId: user.room }, { $pull: { codewords: codewordId } }, (err, res) => {
                                     if (err) console.log(err);
                                     else {
-                                        if (res.codewords.length === 1) {
+                                        console.log("undijn",res);
+                                        if (res.codewords!==undefined && res.codewords.length === 1) {
                                             qCount++;
                                         }
                                     }

@@ -8,7 +8,19 @@ module.exports = {
         User.findById(userId)
         .populate([{
             path:'projects', 
-            model: 'Project'
+            model: 'Project',
+            populate:[
+                {
+                    path: 'assignedTo',
+                    model:'User',
+                    select:'email name'
+                },
+                {
+                    path: 'CreatedBy',
+                    model:'User',
+                    select:'email name'
+                }
+            ]
         }]).exec((err,result)=>{
             if(err)  res.status(STATUS_CODE.ServerError).send({ err: err });
             else{
