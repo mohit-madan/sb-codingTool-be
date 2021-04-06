@@ -169,6 +169,7 @@ module.exports = {
 
     leftMenu: (req, res) => {
         const questionId = req.body.questionId;
+        console.log("leftMenu Call: ", questionId);
         Question.findById(questionId).
             populate([{
                 path: 'root',

@@ -1,7 +1,13 @@
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
-const { loginTokenExpiresIn} = require('../constant');
+const { sendEmail } = require('../config/sendEmail');
+const { loginTokenExpiresIn,
+        verificationEmailTokenExpiresIn,
+        domainName,
+        registerEmail_from,
+        registerEmail_subject,
+        registerEmail_text} = require('../constant');
 const STATUS_CODE = require('../statusCode')
 const RESPONSE_MESSAGE = require('../responseMessage')
 
@@ -20,18 +26,32 @@ module.exports = {
                         if (!user.password) {
                             res.status(STATUS_CODE.Ok).send({ message: RESPONSE_MESSAGE.passwordNotFound });
                         }
-                        else if (user.verified) {
-                            if (user.comparePassword(password)) {
+                        else if (user.comparePassword(password)) {
+                            if (user.verified){
                                 //login
                                 //expires time 15 minutes
                                 const accessToken = jwt.sign({ username }, process.env.JWT_ACCESS_KEY, { expiresIn: loginTokenExpiresIn });
                                 res.status(STATUS_CODE.Ok).send({ auth: true, accessToken: accessToken, user:user });
                             } else {
-                                res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.passwordNotMatch });
+                                    // 10 minutes
+                                    const Token = await jwt.sign({ username, password }, process.env.JWT_ACCESS_KEY, { expiresIn: verificationEmailTokenExpiresIn });
+                                    console.log(Token);
+                                    const data = {
+                                        from: `${registerEmail_from}`,
+                                        to: username,
+                                        subject: `${registerEmail_subject}`,
+                                        text: `${registerEmail_text}`,
+                                        html: `<h1 style="color: #d03737" >Hello Survey Buddy</h1>
+                                                    <p>Thanks for Registering.</p>
+                                                    <a class="btn btn-primary" href="${domainName}/confirm/${Token}">Verify your account</a>`
+                                    }
+                                    sendEmail(data);
+                                    res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.unverifiedUser });  
                             }
 
                         } else {
-                            res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.unverifiedUser });
+                            res.status(STATUS_CODE.Unauthorized).send({ message: RESPONSE_MESSAGE.passwordNotMatch });
+                            
                         }
                     }
                 }

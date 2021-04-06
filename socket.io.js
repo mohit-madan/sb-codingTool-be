@@ -16,6 +16,7 @@ const { cacheTimeFullProject } = require('./constant');
 
 const findStructure = async (user) => {
     let Tree;
+    console.log("room fetch:0", user.room);
     await new Promise((resolve, reject) => {
         Question.findById(user.room).
             populate([{
