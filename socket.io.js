@@ -218,7 +218,7 @@ module.exports = (io) => {
 
         //for single selected response operation = { resNum, codewordIds:[arrayOfcodewordId]}
         socket.on('single-response-operation', async operation => {
-            console.log(operation)
+            console.log({resNum:[operation.resNum],codewordIds:[operation.codewordIds]})
             const user = await getCurrentUser(socket.id);
             //update status of cache update
             client.setex(`${user.projectId}=>status`, cacheTimeFullProject, 'true');
@@ -314,9 +314,9 @@ module.exports = (io) => {
                 tag: codeword
             }).save(async (err, result) => {
                 if (!err) {
-                    Codebook.findByIdAndUpdate(user.questionCodebookId, { $addToSet: { codewords: result._id } }, { new: true }, (err, res) => {
+                    Codebook.findByIdAndUpdate(user.questionCodebookId, { $addToSet: { codewords: result._id }}, {new:true}, (err, res) => {
                         if (err) { console.log(err); }
-                        else console.log("Codebook.findByIdAndUpdate(user.questionCodebookId-->", { res })
+                        else console.log("Codebook.findByIdAndUpdate(user.questionCodebookId-->",{res})
                     });
                     Codebook.findByIdAndUpdate(projectCodebookId, { $addToSet: { codewords: result._id } }, (err, res) => {
                         if (err) { console.log(err); }
@@ -331,7 +331,8 @@ module.exports = (io) => {
                         });
                     }
                     //triger add new codeword to connect all users to this room
-                    io.to(user.room).emit('add-new-codeword-to-list', { codewordId: result._id, codeword: newCodeword.codeword, codekey: newCodeword.codekey });
+                    const leftMenuCodes=newCodeword.leftMenuCodes
+                    io.to(user.room).emit('add-new-codeword-to-list', { codewordId: result._id, codeword: newCodeword.codeword, codekey: newCodeword.codekey ,leftMenuCodes:leftMenuCodes});
                     const Tree = await findStructure(user)
                     console.log({ Tree });
                     io.to(user.room).emit('root', Tree);
@@ -346,7 +347,6 @@ module.exports = (io) => {
         //Listen for delete (codeword=>{codewordId})
         socket.on('deleteCodeword', async (deleteCodeword) => {
             const user = await getCurrentUser(socket.id);
-            console.log("delete trigger=>");
             let responses;
             //update status of cache update
             client.setex(`${user.projectId}=>status`, cacheTimeFullProject, 'true');
@@ -355,7 +355,7 @@ module.exports = (io) => {
 
 
             console.log("delete codeword socket triggered")
-            console.log({ codewordId })
+            console.log({codewordId})
 
             Codeword.findById(codewordId, (err, codeword) => {
                 if (err) console.log(err);
@@ -363,7 +363,7 @@ module.exports = (io) => {
                     let count = 0;
                     let qCount = 0;
                     responses = codeword.resToAssigned;
-                    if (responses.length === 0) {
+                    if(responses.length===0){
                         Codeword.findByIdAndRemove(codewordId, (err, res) => {
                             if (err) { console.log(err); }
                             else {
@@ -373,7 +373,7 @@ module.exports = (io) => {
                                     .exec(async (err, question) => {
                                         if (err) { console.log(err); }
                                         else {
-                                            console.log("else in delete socket", { question })
+                                            console.log("else in delete socket",{question})
                                             //triger Response of Question coded to connect all users to this room
                                             io.to(user.room).emit('question-response-coded', { resOfCoded: question.resOfCoded });
 
@@ -384,15 +384,15 @@ module.exports = (io) => {
                                     });
                             }
                         });
-                    } else {
+                    }else {
                         new Promise(resolve => {
                             codeword.resToAssigned.map(resId => {
                                 console.log("resNum:", resId);
                                 Response.updateOne({ resNum: resId, questionId: user.room }, { $pull: { codewords: codewordId } }, (err, res) => {
                                     if (err) console.log(err);
                                     else {
-                                        console.log("undijn", res);
-                                        if (res.codewords !== undefined && res.codewords.length === 1) {
+                                        console.log("undijn",res);
+                                        if (res.codewords!==undefined && res.codewords.length === 1) {
                                             qCount++;
                                         }
                                     }
@@ -412,10 +412,10 @@ module.exports = (io) => {
                                         .exec(async (err, question) => {
                                             if (err) { console.log(err); }
                                             else {
-                                                console.log("else in delete socket", { question })
+                                                console.log("else in delete socket",{question})
                                                 //triger Response of Question coded to connect all users to this room
                                                 io.to(user.room).emit('question-response-coded', { resOfCoded: question.resOfCoded });
-
+    
                                                 const Tree = await findStructure(user)
                                                 console.log({ Tree });
                                                 io.to(user.room).emit('root', Tree);
@@ -423,13 +423,13 @@ module.exports = (io) => {
                                         });
                                 }
                             });
-
+    
                         }).catch(err => {
                             console.log({ err });
                             socket.emit('message', 'Someting went wrong during delete codeword');
                         })
                     }
-
+                    
 
                 }
             })
@@ -439,11 +439,10 @@ module.exports = (io) => {
         //Listen for edit (codeword=>{codeword, codewordId})
         socket.on('editCodeword', async (editCodeword) => {
             const user = await getCurrentUser(socket.id);
-            console.log("edit trigger=>");
             //update status of cache update
             client.setex(`${user.projectId}=>status`, cacheTimeFullProject, 'true');
             //here also make change to db
-            const { codeword, codewordId} = editCodeword;
+            const { codeword, codewordId ,oldName} = editCodeword;
             Codeword.findByIdAndUpdate(codewordId, { $set: { tag: codeword } }, (err, res) => {
                 if (err) { console.log(err); }
             });
@@ -461,19 +460,20 @@ module.exports = (io) => {
             client.setex(`${user.projectId}=>status`, cacheTimeFullProject, 'true');
             //here also make change to db
             const codewordId = toggleCodeword.codewordId;
-            console.log("togggle trigger=>", toggleCodeword.status);
-            Codeword.findByIdAndUpdate(codewordId, { $set: { active: !toggleCodeword.status } }, { new: true },async (err, res) => {
+            Codeword.findByIdAndUpdate(codewordId, { $set: { active: !toggleCodeword.status } }, { new: true }, async (err, res) => {
                 if (err) { console.log(err); }
                 else {
                     //triger edit codeword to connect all users to this room
-                    console.log("togggle trigger after change=>", res);
                     const Tree = await findStructure(user)
                     console.log({ Tree });
                     io.to(user.room).emit('root', Tree);
+
                     const response = res.resToAssigned;
-                    const codewordName = res.tag;
-                    const status = !toggleCodeword.codewordId
-                    io.to(user.room).emit('toggle-codeword-to-list', { codewordId, response, active:status, codewordName});
+                    const codewordName=res.tag
+                    const keywords=toggleCodeword.keywords
+                    const leftMenuCodes=toggleCodeword.leftMenuCodes
+                    const status = toggleCodeword.status==true ? false : true
+                    io.to(user.room).emit('toggle-codeword-to-list', { codewordId, response ,active: status ,codewordName:codewordName ,keywords:keywords,leftMenuCodes:leftMenuCodes});
                 }
             });
         });
@@ -484,30 +484,30 @@ module.exports = (io) => {
             const codewordId = assingedCodeword.codewordId;
             const categoryId = assingedCodeword.categoryId;
             const categoryName = assingedCodeword.categoryName;
-            console.log("assingedCodeword is triggered-->", { assingedCodeword })
-            Question.findByIdAndUpdate(user.room, { $pull: { rootCodebook: codewordId } }, { new: true }, (err, res) => {
+            console.log("assingedCodeword is triggered-->",{assingedCodeword})
+            Question.findByIdAndUpdate(user.room, { $pull: { rootCodebook: codewordId }},{new:true}, (err, res) => {
                 if (err) { console.log(err) }
                 else {
-                    console.log("res-->", { res })
-                    if (categoryId !== undefined) {
-                        console.log({ categoryId })
-                        Folder.findByIdAndUpdate(categoryId, { $addToSet: { codewords: codewordId } }, async (err, res) => {
+                    console.log("res-->",{res})
+                    if(categoryId!==undefined){
+                        console.log({categoryId})
+                        Folder.findByIdAndUpdate(categoryId, { $addToSet: { codewords: codewordId } },async(err, res) => {
                             if (err) { console.log(err) }
                             else {
                                 const Tree = await findStructure(user)
-                                console.log({ res })
+                                console.log({res})
                                 console.log({ Tree });
                                 io.to(user.room).emit('root', Tree);
                             }
                         });
-                    } else {
+                    }else{
                         const newCategory = new Folder({
                             _id: new mongoose.Types.ObjectId(),
                             name: categoryName
                         }).save(async (err, category) => {
                             if (err) { console.log(err) }
                             else {
-                                Question.findByIdAndUpdate(user.room, { $push: { root: category._id } }, async (err, res) => {
+                                Question.findByIdAndUpdate(user.room, { $push: { root: category._id } }, async(err, res) => {
                                     if (err) { console.log(err) }
                                     else {
                                         const Tree = await findStructure(user)
@@ -515,11 +515,11 @@ module.exports = (io) => {
                                         io.to(user.room).emit('root', Tree);
                                     }
                                 });
-                                Folder.findByIdAndUpdate(category._id, { $addToSet: { codewords: codewordId } }, async (err, res) => {
+                                Folder.findByIdAndUpdate(category._id, { $addToSet: { codewords: codewordId } }, async(err, res) => {
                                     if (err) { console.log(err) }
                                     else {
                                         const Tree = await findStructure(user)
-                                        console.log({ res })
+                                        console.log({res})
                                         console.log({ Tree });
                                         io.to(user.room).emit('root', Tree);
                                     }
@@ -527,7 +527,7 @@ module.exports = (io) => {
                             }
                         });
                     }
-
+                    
                 }
             })
         });
@@ -541,23 +541,23 @@ module.exports = (io) => {
             const categoryId2 = moveCodeword.categoryId2;
             const categoryName = moveCodeword.categoryName;
 
-            console.log({ moveCodeword })
+            console.log({moveCodeword})
 
             Folder.findByIdAndUpdate(categoryId1, { $pull: { codewords: codewordId } }, (err, res) => {
                 if (err) { console.log(err) }
                 else {
-                    if (categoryId2 !== undefined) {
-                        Folder.findByIdAndUpdate(categoryId2,
-                            { $addToSet: { codewords: codewordId } }, async (err, res) => {
-                                if (err) { console.log(err) }
-                                else {
-                                    const Tree = await findStructure(user)
-                                    console.log({ Tree });
-                                    io.to(user.room).emit('root', Tree);
-                                }
-                            });
+                    if(categoryId2!==undefined){
+                        Folder.findByIdAndUpdate(categoryId2, 
+                            { $addToSet: { codewords: codewordId } }, async(err, res) => {
+                            if (err) { console.log(err) }
+                            else {
+                                const Tree = await findStructure(user)
+                                console.log({ Tree });
+                                io.to(user.room).emit('root', Tree);
+                            }
+                        });
                     }
-                    else {
+                    else{
                         const newCategory = new Folder({
                             _id: new mongoose.Types.ObjectId(),
                             name: categoryName
@@ -565,7 +565,7 @@ module.exports = (io) => {
                             if (err) { console.log(err) }
                             else {
 
-                                Question.findByIdAndUpdate(user.room, { $push: { root: category._id } }, async (err, res) => {
+                                Question.findByIdAndUpdate(user.room, { $push: { root: category._id } }, async(err, res) => {
                                     if (err) { console.log(err) }
                                     else {
                                         const Tree = await findStructure(user)
@@ -574,15 +574,15 @@ module.exports = (io) => {
                                     }
                                 });
 
-                                Folder.findByIdAndUpdate(category._id,
-                                    { $addToSet: { codewords: codewordId } }, async (err, res) => {
-                                        if (err) { console.log(err) }
-                                        else {
-                                            const Tree = await findStructure(user)
-                                            console.log({ Tree });
-                                            io.to(user.room).emit('root', Tree);
-                                        }
-                                    });
+                                Folder.findByIdAndUpdate(category._id, 
+                                    { $addToSet: { codewords: codewordId } }, async(err, res) => {
+                                    if (err) { console.log(err) }
+                                    else {
+                                        const Tree = await findStructure(user)
+                                        console.log({ Tree });
+                                        io.to(user.room).emit('root', Tree);
+                                    }
+                                });
                             }
                         });
                     }
@@ -600,7 +600,7 @@ module.exports = (io) => {
             }).save(async (err, res) => {
                 if (err) { console.log(err) }
                 else {
-                    Question.findByIdAndUpdate(user.room, { $push: { root: res._id } }, async (err, res) => {
+                    Question.findByIdAndUpdate(user.room, { $push: { root: res._id } }, async(err, res) => {
                         if (err) { console.log(err) }
                         else {
                             const Tree = await findStructure(user)
