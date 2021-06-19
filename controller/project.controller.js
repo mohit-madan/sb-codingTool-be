@@ -51,15 +51,16 @@ const fetchSomeResponse = async (data, questionNumber, questionId) => {
         data.forEach((cr) => {
             row = cr.split(',');
             count++;
-            if (row[questionNumber] === undefined || row[questionNumber] == '' || row[questionNumber] == '\r\n') {
+            updatedQuestionNumber = questionNumber+1;
+            if (row[updatedQuestionNumber] === undefined || row[updatedQuestionNumber] == '' || row[updatedQuestionNumber] == '\r\n') {
                 console.log('');
             } else {
                 resNum++;
                 const response = {
                     _id: new mongoose.Types.ObjectId(),
                     resNum: resNum,
-                    desc: row[questionNumber],
-                    length: String(row[questionNumber]).length,
+                    desc: row[updatedQuestionNumber],
+                    length: String(row[updatedQuestionNumber]).length,
                     questionId: questionId
                 }
                 responseList.push(response);
