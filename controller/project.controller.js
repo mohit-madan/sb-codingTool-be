@@ -9,6 +9,7 @@ const logger = require('../logger')
 const RESPONSE_MESSAGE = require('../responseMessage')
 const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
+var XLSX = require('xlsx')
 const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_ID,
     secretAccessKey: process.env.AWS_ACCESS_SECRET
@@ -99,6 +100,46 @@ const saveResponse = async (data, coloumns, project) => {
     }).then((res) => res);
 }
 
+const processExcel = async (data) => {
+    var workbook = XLSX.read(data, {
+      type: 'buffer'
+    });
+    var firstSheet = workbook.SheetNames[0];
+    var data = await to_json(workbook);
+    return data
+  };
+
+  const to_json = async (workbook) => {
+    var result = [];
+    workbook.SheetNames.forEach(function(sheetName) {
+      var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+        header: 1
+      });
+      if (roa.length) result.push(roa);
+    });
+    return result[0].map(x => x.toString());
+  };
+
+  function getBufferFromS3(params, callback){
+    const buffers = [];
+    const stream = s3.getObject(params).createReadStream();
+    stream.on('data', data => buffers.push(data));
+    stream.on('end', () => callback(null, Buffer.concat(buffers)));
+    stream.on('error', error => callback(error));
+  }
+
+  // promisify read stream from s3
+  function getBufferFromS3Promise(params) {
+    return new Promise((resolve, reject) => {
+      getBufferFromS3(params, (error, s3buffer) => {
+        if (error) return console.log(error);
+        return resolve(s3buffer);
+      });
+    });
+  };
+
+  // create workbook from buffer
+
 
 module.exports = {
     createProject: async (req, res) => {
@@ -129,7 +170,7 @@ module.exports = {
         });
         //there add project._id to user project list then send back response
         await User.findByIdAndUpdate(req.user._id, { $push: { projects: project._id } }, { upsert: true, new: true })
-            .then(() => {
+            .then(async () => {
                 //here fetch data from document file (question, [respones]) and store to database
                 const formate = key.split('.');
                 if (formate[formate.length - 1] === 'csv') {
@@ -148,7 +189,21 @@ module.exports = {
                             }).catch((err) => console.log(err));
                         }//eles body finish
                     })
-                } else {
+                } else if (formate[formate.length - 1] === 'xlsx') {
+                    const params = {
+                        Bucket: process.env.AWS_DOCUMENT_BUCKET,
+                        Key: key
+                    }
+                    const buffer = await getBufferFromS3Promise(params);
+                    const workbook = await XLSX.read(buffer);
+
+                    const data = await to_json(workbook);
+                    
+                    await saveResponse(data.splice(1), coloumns, project._doc).then((results) => {
+                        console.log(results);
+                        res.status(STATUS_CODE.Ok).send({ message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
+                    }).catch((err) => console.log(err));
+                }   else {
                     res.status(STATUS_CODE.Ok).send({ message: 'only .csv file logic implement' });
                 }
             })
