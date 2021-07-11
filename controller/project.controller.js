@@ -177,6 +177,13 @@ module.exports = {
     createProject: async (req, res) => {
         const { name, desc, key, columns,filterColumns, industry, type, tags } = req.body;
         const codebookId = await createCodebook();
+
+        const projectExists = await Project.findOne({name:name});
+        if(projectExists){
+            res.status(STATUS_CODE.BadRequest).send({ message:"Duplicate project name cannot be used." })
+            throw new Error("Duplicate project name cannot be used.");
+        }else {
+
         const newProject = new Project({
             _id: new mongoose.Types.ObjectId(),
             name: name,
@@ -242,7 +249,7 @@ module.exports = {
                 }
             })
             .catch(err => res.status(STATUS_CODE.ServerError).send(err));
-    },
+    }},
 
     projectDetails: (req, res) => {
         const id = req.body.id;

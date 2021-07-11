@@ -16,7 +16,10 @@ router.post('/getFile', authenticateUser, getFile );
 router.post('/deleteFile', authenticateUser, deleteFile );
 
 //create new project 
-router.post('/createProject', authenticateUser, createProject);
+router.post('/createProject', authenticateUser, async (req,res) => { 
+    createProject(req,res).then((res) => console.log("Project Creation Successful"))
+    .catch(err=>console.trace(err))
+});
 
 //get details of project
 router.post('/projectDetails', authenticateUser, projectDetails);

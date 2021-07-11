@@ -5,7 +5,7 @@ const Codebook = require('./codebook.model');
 
 const projectSchema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
-    name: String,
+    name: {type:String, unique:true},
     desc: String, 
     industry:String,
     type: String,
