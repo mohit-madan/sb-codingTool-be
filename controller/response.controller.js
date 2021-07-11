@@ -83,14 +83,38 @@ const fiterByResponsePatternExactMatch = async (pattern, result) => {
 
 const fiterByResponseOnCodewordMatch = async (codeword, result) => {
     let temp1=[]
+    var regExp = new RegExp("^" + codeword + "$", 'i');
     const filterFunction=({ resNum, desc, length, codewords }) => {
-        var regExp = new RegExp("^" + codeword + "$", 'i');
         if (codewords.length > 0) {
             codewords.map(it => {
                 console.log(it.tag);
                 if (it.tag.search(regExp) != -1) {
                     temp1.push({ resNum, desc, length, codewords })
                 }//match return true
+            })
+        }
+        return false;
+    }
+    await result.map(filterFunction)
+    return temp1.map(({ resNum, desc, length, codewords }) => {
+        return { resNum, desc, length, codewords };
+    })
+}
+
+const filterByResponseOnCodewordGroupMatch = async (codewords, result) => {
+    let temp1=[]
+    var regExps = codewords.map(codeword => new RegExp("^" + codeword + "$", 'i'));
+
+    const filterFunction=({ resNum, desc, length, codewords }) => {
+        if (codewords.length > 0) {
+            codewords.map(it => {
+                console.log(it.tag);
+                regExps.forEach(regExp => {
+                    if (it.tag.search(regExp) != -1) {
+                        temp1.push({ resNum, desc, length, codewords })
+                    }//match return true
+                })
+                
             })
         }
         return false;
@@ -161,6 +185,8 @@ const applyFilter = async (result, operators) => {
             case 9: // sort By Response Which Have Not Any Codeword
                 result = await fiterByResponseWhichHaveNotAnyCodeword(result);
                 break;
+            case 10:
+                result = await filterByResponseOnCodewordGroupMatch(operators[i].codewordGroup,result);
             default: //sort By Response Base On Length Asc Order
                 result = await fiterByLengthAscOrder(result);
 
