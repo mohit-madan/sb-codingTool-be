@@ -155,31 +155,7 @@ const fiterByResponseWhichHaveNotAnyCodeword = async (result) => {
     })
 }
 
-const filterByFilterColumnResponsePatternMatch = async (pattern, filter, result, data) => {
-    const response = await fetchQuestionsResponse(JSON.parse(data), [{"questionId":filter}]);
-    filterResult = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc}));
-
-    resNumResult = await filterResult.filter(({ resNum, desc }) => {
-        pattern = pattern.toLowerCase();
-        if (desc.toLowerCase().indexOf(pattern) != -1) {
-            return true;
-        } else return false;
-    }).map(({ resNum, desc}) => {
-        return {resNum};
-    });
-
-    resNumResult = resNumResult.map(data => data.resNum);
-
-    return await result.filter(({ resNum, desc, length, codewords, indices }) => {
-        if (resNumResult.includes(resNum)) {
-            return true;
-        } else return false;
-    }).map(({ resNum, desc, length, codewords, indices }) => {
-        return { resNum, desc, length, codewords, indices };
-    });
-}
-
-const applyFilter = async (result, operators, data) => {
+const applyFilter = async (result, operators) => {
     for (let i = 0; i < operators.length; i++) {
         switch (operators[i].operator) {
             case 1:  //sort By Response Base On Length Asc Order
@@ -211,8 +187,6 @@ const applyFilter = async (result, operators, data) => {
                 break;
             case 10:
                 result = await filterByResponseOnCodewordGroupMatch(operators[i].codewordGroup,result);
-            case 11:
-                result = await filterByFilterColumnResponsePatternMatch(operators[i].pattern, operators[i].filter, result, data);
             default: //sort By Response Base On Length Asc Order
                 result = await fiterByLengthAscOrder(result);
 
@@ -335,7 +309,7 @@ module.exports = {
                                 const response = await fetchQuestionsResponse(JSON.parse(data), questions);
                                 result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
                                 const totalRes = result.length;
-                                const filter = applyFilter(result, operators, data);
+                                const filter = applyFilter(result, operators);
                                 filter.then((filtered) => {
                                     res.status(STATUS_CODE.Ok).send({
                                         result: filtered,
@@ -353,7 +327,7 @@ module.exports = {
                                 const response = await fetchQuestionsResponse(data, questions);
                                 result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
                                 const totalRes = result.length;
-                                const filter = applyFilter(result, operators, data);
+                                const filter = applyFilter(result, operators);
                                 filter.then((filtered) => {
                                     res.status(STATUS_CODE.Ok).send({
                                         result: filtered,
@@ -376,7 +350,7 @@ module.exports = {
                     const response = await fetchQuestionsResponse(data, questions);
                     result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
                     const totalRes = result.length;
-                    const filter = applyFilter(result, operators, data);
+                    const filter = applyFilter(result, operators);
                     filter.then((filtered) => {
                         console.log("hihisf",req.body);
                         client.setex(`${JSON.stringify(req.body)}`, cacheTimeForFilter, JSON.stringify(filtered));
