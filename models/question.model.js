@@ -13,11 +13,7 @@ const questionSchema = new mongoose.Schema({
     codebook:{type: mongoose.Schema.Types.ObjectId, ref: 'Codebook'},
     //root codewords
     rootCodebook:[{type: mongoose.Schema.Types.ObjectId, ref:'Codeword'}],
-    root:[{type: mongoose.Schema.Types.ObjectId, ref: 'Folder'}],
-    qType: {
-        type:String,
-        enum:['Q','F']
-    }
+    root:[{type: mongoose.Schema.Types.ObjectId, ref: 'Folder'}]
 });
 
 

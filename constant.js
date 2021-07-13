@@ -1,11 +1,5 @@
 const domainName = 'http://localhost:5000';
 const frontendUrl = 'http://localhost:3000'
-
-//QuestionType Enum
-const qType_Question = "Q"
-const qType_Filter = "F"
-
-
 // expired time of token 
 const loginTokenExpiresIn = '1800s'; // 15 minutes
 const verificationEmailTokenExpiresIn = '600s'; // 10 minutes
@@ -34,7 +28,5 @@ module.exports ={
    forgetPassEmail_subject,
    forgetPassEmail_text,
    frontendUrl,
-   cacheTimeFullProject,
-   qType_Question,
-   qType_Filter
+   cacheTimeFullProject
 }

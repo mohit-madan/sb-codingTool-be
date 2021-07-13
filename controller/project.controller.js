@@ -9,7 +9,6 @@ const logger = require('../logger')
 const RESPONSE_MESSAGE = require('../responseMessage')
 const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
-const constants = require('../constant')
 var XLSX = require('xlsx')
 const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_ID,
@@ -30,12 +29,11 @@ const createCodebook = async () => {
 }
 
 
-const createQuestion = async (desc, codebookId, qType) => {
+const createQuestion = async (desc, codebookId) => {
     const newQuestion = new Question({
         _id: new mongoose.Types.ObjectId(),
         desc: desc,
-        codebook: codebookId,
-        qType: qType
+        codebook: codebookId
     });
     const question = await newQuestion.save()
         .then(question => question)
@@ -74,14 +72,12 @@ const fetchSomeResponse = async (data, questionNumber, questionId) => {
         });
     }).then(() => responseList).catch(err => console.log(err));
 }
-
-
-const saveResponse = async (data, columns, filterColumns, project) => {
+const saveResponse = async (data, coloumns, project) => {
     let count = 0;
-    let promiseColumns = new Promise(resolve => {
-        columns.map(async ele => {
+    return new Promise(resolve => {
+        coloumns.map(async ele => {
             const codebookId = await createCodebook();
-            const questionId = await createQuestion(ele.question, codebookId, constants.qType_Question);
+            const questionId = await createQuestion(ele.question, codebookId);
             Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
                 .exec((err, info) => {
                     if (err) console.log("Error during push question in project question list: ", err);
@@ -94,7 +90,7 @@ const saveResponse = async (data, columns, filterColumns, project) => {
                         .exec((err, result) => {
                             if (err) console.log(err);
                             count++;
-                            if (count === columns.length) {
+                            if (count === coloumns.length) {
                                 resolve("Project is created successfully");
                             }
                         })
@@ -102,34 +98,6 @@ const saveResponse = async (data, columns, filterColumns, project) => {
                 .catch((err) => console.log(err));
         });
     }).then((res) => res);
-
-    let promiseFilterColumns = new Promise(resolve => {
-        filterColumns.map(async ele => {
-            const questionId = await createQuestion(ele.question, null, constants.qType_Filter);
-            Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
-                .exec((err, info) => {
-                    if (err) console.log("Error during push question in project question list: ", err);
-                })
-            const responseArray = await fetchSomeResponse(data, ele.coloumn, questionId);
-            Response.insertMany(responseArray)
-                .then(async (doc) => {
-                    const responseIds = await doc.map(ele => ele._id);
-                    Question.findByIdAndUpdate(questionId, { $push: { listOfResponses: { $each: responseIds } } })
-                        .exec((err, result) => {
-                            if (err) console.log(err);
-                            count++;
-                            if (count === filterColumns.length) {
-                                resolve("Project is created successfully");
-                            }
-                        })
-                })
-                .catch((err) => console.log(err));
-        });
-    }).then((res) => res);
-
-    return Promise.all(promiseColumns,promiseFilterColumns)
-    .then(res => res)
-    .catch(err => console.log(err))
 }
 
 const processExcel = async (data) => {
@@ -175,7 +143,7 @@ const processExcel = async (data) => {
 
 module.exports = {
     createProject: async (req, res) => {
-        const { name, desc, key, columns,filterColumns, industry, type, tags } = req.body;
+        const { name, desc, key, coloumns, industry, type, tags } = req.body;
         const codebookId = await createCodebook();
 
         const projectExists = await Project.findOne({name:name});
@@ -222,12 +190,10 @@ module.exports = {
                             res.status(STATUS_CODE.ServerError).send({ err });
                         } else {
                             const data = result.Body.toString("utf8").split('\r\n');
-                            await saveResponse(data.splice(1), columns, filterColumns,project._doc).then((results) => {
+                            await saveResponse(data.splice(1), coloumns, project._doc).then((results) => {
                                 console.log(results);
                                 res.status(STATUS_CODE.Ok).send({ message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
                             }).catch((err) => console.log(err));
-
-
                         }//eles body finish
                     })
                 } else if (formate[formate.length - 1] === 'xlsx') {
@@ -240,7 +206,7 @@ module.exports = {
 
                     const data = await to_json(workbook);
                     
-                    await saveResponse(data.splice(1), columns, filterColumns, project._doc).then((results) => {
+                    await saveResponse(data.splice(1), coloumns, project._doc).then((results) => {
                         console.log(results);
                         res.status(STATUS_CODE.Ok).send({ message: RESPONSE_MESSAGE.projectCreated, projectId: project._id });
                     }).catch((err) => console.log(err));
