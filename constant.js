@@ -1,5 +1,7 @@
-const domainName = 'http://localhost:5000';
-const frontendUrl = 'http://localhost:3000'
+// const domainName = 'http://localhost:5000';
+// const frontendUrl = 'http://localhost:3000';
+const domainName = 'http://3.7.6.81/';
+const frontendUrl = 'http://3.7.6.81/';
 // expired time of token 
 const loginTokenExpiresIn = '1800s'; // 15 minutes
 const verificationEmailTokenExpiresIn = '600s'; // 10 minutes
