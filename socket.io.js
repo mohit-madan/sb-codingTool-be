@@ -231,7 +231,7 @@ module.exports = (io) => {
                     if (err) { console.log(err); }
                     else {
                         idArray = response.codewords;
-                        Response.findByIdAndUpdate(response._id, { $addToSet: { codewords: { $each: operation.codewordIds } } }, (err, res) => {
+                        Response.findByIdAndUpdate(response._id, { $set: { codewords: operation.codewordIds  } }, (err, res) => {
                             if (err) { console.log(err); }
                             else {
                                 // console.log("response:", res);
