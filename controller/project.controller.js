@@ -47,21 +47,19 @@ const createQuestion = async (desc, codebookId, qType) => {
 }
 
 const fetchSomeResponse = async (data, questionNumber, questionId) => {
-    let resNum = 0;
     let responseList = []
     let count = 0;
     return new Promise((resolve) => {
         data.forEach((cr) => {
             row = cr.split(',');
             count++;
-            updatedQuestionNumber = questionNumber+1;
-            if (row[updatedQuestionNumber] === undefined || row[updatedQuestionNumber] == '' || row[updatedQuestionNumber] == '\r\n') {
-                console.log('');
+            updatedQuestionNumber = questionNumber;
+            if (row[updatedQuestionNumber] === undefined/* || row[updatedQuestionNumber] == '' || row[updatedQuestionNumber] == '\r\n'*/) {
+                console.log('Response Undefine - Check fetchSomeResponse in project.controller.js');
             } else {
-                resNum++;
                 const response = {
                     _id: new mongoose.Types.ObjectId(),
-                    resNum: resNum,
+                    resNum: count,
                     desc: row[updatedQuestionNumber],
                     length: String(row[updatedQuestionNumber]).length,
                     questionId: questionId
@@ -77,8 +75,8 @@ const fetchSomeResponse = async (data, questionNumber, questionId) => {
 
 
 const saveResponse = async (data, columns, filterColumns, project) => {
-    let count = 0;
     let promiseColumns = new Promise(resolve => {
+        let countQ = 0;
         columns.map(async ele => {
             const codebookId = await createCodebook();
             const questionId = await createQuestion(ele.question, codebookId, constants.qType_Question);
@@ -86,15 +84,15 @@ const saveResponse = async (data, columns, filterColumns, project) => {
                 .exec((err, info) => {
                     if (err) console.log("Error during push question in project question list: ", err);
                 })
-            const responseArray = await fetchSomeResponse(data, ele.coloumn, questionId);
+            const responseArray = await fetchSomeResponse(data, ele.column, questionId);
             Response.insertMany(responseArray)
                 .then(async (doc) => {
                     const responseIds = await doc.map(ele => ele._id);
                     Question.findByIdAndUpdate(questionId, { $push: { listOfResponses: { $each: responseIds } } })
                         .exec((err, result) => {
                             if (err) console.log(err);
-                            count++;
-                            if (count === columns.length) {
+                            countQ++;
+                            if (countQ === columns.length) {
                                 resolve("Project is created successfully");
                             }
                         })
@@ -104,21 +102,22 @@ const saveResponse = async (data, columns, filterColumns, project) => {
     }).then((res) => res);
 
     let promiseFilterColumns = new Promise(resolve => {
+        let countF = 0;
         filterColumns.map(async ele => {
             const questionId = await createQuestion(ele.question, null, constants.qType_Filter);
             Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
                 .exec((err, info) => {
                     if (err) console.log("Error during push question in project question list: ", err);
                 })
-            const responseArray = await fetchSomeResponse(data, ele.coloumn, questionId);
+            const responseArray = await fetchSomeResponse(data, ele.column, questionId);
             Response.insertMany(responseArray)
                 .then(async (doc) => {
                     const responseIds = await doc.map(ele => ele._id);
                     Question.findByIdAndUpdate(questionId, { $push: { listOfResponses: { $each: responseIds } } })
                         .exec((err, result) => {
                             if (err) console.log(err);
-                            count++;
-                            if (count === filterColumns.length) {
+                            countF++;
+                            if (countF === filterColumns.length) {
                                 resolve("Project is created successfully");
                             }
                         })
@@ -127,7 +126,7 @@ const saveResponse = async (data, columns, filterColumns, project) => {
         });
     }).then((res) => res);
 
-    return Promise.all(promiseColumns,promiseFilterColumns)
+    return Promise.all([promiseColumns,promiseFilterColumns])
     .then(res => res)
     .catch(err => console.log(err))
 }
@@ -296,10 +295,14 @@ module.exports = {
                 }
                 else {
                     // console.log(data);
-                    const questionCodebookId = data.codebook._id;
-                    const codewords = data.codebook.codewords;
-                    const tree = [...data.rootCodebook, ...data.root,]
-
+                    var questionCodebookId ;
+                    var codewords ;
+                    var tree ;
+                    if(data.codebook){
+                        questionCodebookId = data.codebook._id;
+                        codewords = data.codebook.codewords;
+                        tree = [...data.rootCodebook, ...data.root,]
+                    }
                     console.log("data.codebook-->",data.codebook);
                     
                     console.log({codewords})
