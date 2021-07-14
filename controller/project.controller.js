@@ -51,10 +51,10 @@ const fetchSomeResponse = async (data, questionNumber, questionId) => {
     let count = 0;
     return new Promise((resolve) => {
         data.forEach((cr) => {
-            row = cr.split(',');
+            row = cr.split('!,!');
             count++;
             updatedQuestionNumber = questionNumber;
-            if (row[updatedQuestionNumber] === undefined/* || row[updatedQuestionNumber] == '' || row[updatedQuestionNumber] == '\r\n'*/) {
+            if (row[updatedQuestionNumber] === undefined || row[updatedQuestionNumber] == '' || row[updatedQuestionNumber] == '\r\n') {
                 console.log('Response Undefine - Check fetchSomeResponse in project.controller.js');
             } else {
                 const response = {
@@ -148,7 +148,7 @@ const processExcel = async (data) => {
       });
       if (roa.length) result.push(roa);
     });
-    return result[0].map(x => x.toString());
+    return result[0].map(x => x.join("!,!"));
   };
 
   function getBufferFromS3(params, callback){
