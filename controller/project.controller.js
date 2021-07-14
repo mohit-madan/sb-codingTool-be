@@ -77,53 +77,62 @@ const fetchSomeResponse = async (data, questionNumber, questionId) => {
 const saveResponse = async (data, columns, filterColumns, project) => {
     let promiseColumns = new Promise(resolve => {
         let countQ = 0;
-        columns.map(async ele => {
-            const codebookId = await createCodebook();
-            const questionId = await createQuestion(ele.question, codebookId, constants.qType_Question);
-            Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
-                .exec((err, info) => {
-                    if (err) console.log("Error during push question in project question list: ", err);
-                })
-            const responseArray = await fetchSomeResponse(data, ele.column, questionId);
-            Response.insertMany(responseArray)
-                .then(async (doc) => {
-                    const responseIds = await doc.map(ele => ele._id);
-                    Question.findByIdAndUpdate(questionId, { $push: { listOfResponses: { $each: responseIds } } })
-                        .exec((err, result) => {
-                            if (err) console.log(err);
-                            countQ++;
-                            if (countQ === columns.length) {
-                                resolve("Project is created successfully");
-                            }
-                        })
-                })
-                .catch((err) => console.log(err));
-        });
+        if (columns.length===0) {
+            resolve("Project is created successfully");
+        } else{
+            columns.map(async ele => {
+                const codebookId = await createCodebook();
+                const questionId = await createQuestion(ele.question, codebookId, constants.qType_Question);
+                Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
+                    .exec((err, info) => {
+                        if (err) console.log("Error during push question in project question list: ", err);
+                    })
+                const responseArray = await fetchSomeResponse(data, ele.column, questionId);
+                Response.insertMany(responseArray)
+                    .then(async (doc) => {
+                        const responseIds = await doc.map(ele => ele._id);
+                        Question.findByIdAndUpdate(questionId, { $push: { listOfResponses: { $each: responseIds } } })
+                            .exec((err, result) => {
+                                if (err) console.log(err);
+                                countQ++;
+                                if (countQ === columns.length) {
+                                    resolve("Project is created successfully");
+                                }
+                            })
+                    })
+                    .catch((err) => console.log(err));
+            });
+        }
     }).then((res) => res);
 
     let promiseFilterColumns = new Promise(resolve => {
         let countF = 0;
-        filterColumns.map(async ele => {
-            const questionId = await createQuestion(ele.question, null, constants.qType_Filter);
-            Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
-                .exec((err, info) => {
-                    if (err) console.log("Error during push question in project question list: ", err);
-                })
-            const responseArray = await fetchSomeResponse(data, ele.column, questionId);
-            Response.insertMany(responseArray)
-                .then(async (doc) => {
-                    const responseIds = await doc.map(ele => ele._id);
-                    Question.findByIdAndUpdate(questionId, { $push: { listOfResponses: { $each: responseIds } } })
-                        .exec((err, result) => {
-                            if (err) console.log(err);
-                            countF++;
-                            if (countF === filterColumns.length) {
-                                resolve("Project is created successfully");
-                            }
-                        })
-                })
-                .catch((err) => console.log(err));
-        });
+        if (filterColumns.length===0) {
+            resolve("Project is created successfully");
+        } else{
+            filterColumns.map(async ele => {
+
+                const questionId = await createQuestion(ele.question, null, constants.qType_Filter);
+                Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
+                    .exec((err, info) => {
+                        if (err) console.log("Error during push question in project question list: ", err);
+                    })
+                const responseArray = await fetchSomeResponse(data, ele.column, questionId);
+                Response.insertMany(responseArray)
+                    .then(async (doc) => {
+                        const responseIds = await doc.map(ele => ele._id);
+                        Question.findByIdAndUpdate(questionId, { $push: { listOfResponses: { $each: responseIds } } })
+                            .exec((err, result) => {
+                                if (err) console.log(err);
+                                countF++;
+                                if (countF === filterColumns.length) {
+                                    resolve("Project is created successfully");
+                                }
+                            })
+                    })
+                    .catch((err) => console.log(err));
+            });
+        }
     }).then((res) => res);
 
     return Promise.all([promiseColumns,promiseFilterColumns])
