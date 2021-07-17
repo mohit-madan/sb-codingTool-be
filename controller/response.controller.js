@@ -6,6 +6,8 @@ const Response = require('../models/response.model');
 const Codeword = require('../models/codeword.model');
 const { cacheTimeFullProject, cacheTimeForFilter } = require('../constant');
 const client = require('../config/redis.config');
+const {distance} = require('fastest-levenshtein')
+
 
 function ASC(a, b) {
     if (a.desc < b.desc) {
@@ -179,6 +181,22 @@ const filterByFilterColumnResponsePatternMatch = async (pattern, filter, result,
     });
 }
 
+const filterByLevenshteinDistancePatternMatch = async (pattern, distance, result) => {
+    pattern = pattern.toLowerCase();
+    return await result.filter(({ resNum, desc, length, codewords, indices }) => {
+        if (distance(desc, pattern)<=distance) {
+            return true;
+        } else return false;
+    }).map(({ resNum, desc, length, codewords, indices }) => {
+        if (indices !== undefined) {
+            indices = [...indices, ...getIndicesOf(pattern, desc)];
+        } else {
+            indices = [...getIndicesOf(pattern, desc)];
+        }
+        return { resNum, desc, length, codewords, indices };
+    });
+}
+
 const applyFilter = async (result, operators, data) => {
     for (let i = 0; i < operators.length; i++) {
         switch (operators[i].operator) {
@@ -213,6 +231,8 @@ const applyFilter = async (result, operators, data) => {
                 result = await filterByResponseOnCodewordGroupMatch(operators[i].codewordGroup,result);
             case 11:
                 result = await filterByFilterColumnResponsePatternMatch(operators[i].pattern, operators[i].filter, result, data);
+            case 12:
+                result = await filterByLevenshteinDistancePatternMatch(operators[i].pattern, operators[i].distance, result)
             default: //sort By Response Base On Length Asc Order
                 result = await fiterByLengthAscOrder(result);
 
