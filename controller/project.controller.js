@@ -16,6 +16,11 @@ const s3 = new AWS.S3({
     secretAccessKey: process.env.AWS_ACCESS_SECRET
 });
 
+const projectHelper = require('../helpers/project.helper')
+const responseHelper = require('../helpers/response.helper');
+const projectDownload = require('../helpers/project.download');
+
+
 const createCodebook = async () => {
     const newCodebook = new Codebook({
         _id: new mongoose.Types.ObjectId()
@@ -270,6 +275,35 @@ module.exports = {
                     res.status(STATUS_CODE.Ok).send({ project: project });
                 }
             })
+    },
+
+    downloadProjectQuestion: async (req,res) => {
+        try{
+            const {projectId,questionIds} = req.body;
+            
+            const out = await projectDownload.saveFormResponsesToExcel(projectId,questionIds);
+
+            await res.setHeader(
+                "Content-Type",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            );
+            await res.setHeader(
+                "Content-Disposition",
+                "attachment; filename=" + "responses.xlsx"
+            );
+                
+            await out.workbook.xlsx.write(res).
+                                then(()=>{
+                                    res.status(200).send().end();
+                                }).
+                                catch(err => {
+                                    console.log(err)
+                                    res.status(500).send(err)
+                                })
+        } catch(err){
+            console.trace(err);
+        }
+        // res.send({message:"Request Done"});
     },
 
     leftMenu: (req, res) => {

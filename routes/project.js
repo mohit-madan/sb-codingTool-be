@@ -2,9 +2,12 @@ const express = require('express');
 const router = express.Router();
 const { authenticateUser } = require('../auth_config/auth');
 const {uploadFile, deleteFile, getFile} = require('../controller/documentFile.controller'); 
-const {createProject, projectDetails, leftMenu} = require('../controller/project.controller');
+const {createProject, projectDetails, leftMenu, downloadProjectQuestion} = require('../controller/project.controller');
 const {getResponse, operatorResponse} = require('../controller/response.controller');
 const {userSearch, projectList} = require('../controller/dashBoard.controller');
+
+//upload project document file
+router.post('/downloadResponses', downloadProjectQuestion );
 
 //upload project document file
 router.post('/uploadFile', authenticateUser, uploadFile );
