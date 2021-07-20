@@ -211,10 +211,13 @@ const applyFilter = async (result, operators, data) => {
                 break;
             case 10:
                 result = await filterByResponseOnCodewordGroupMatch(operators[i].codewordGroup,result);
+                break;
             case 11:
                 result = await filterByFilterColumnResponsePatternMatch(operators[i].pattern, operators[i].filter, result, data);
-            default: //sort By Response Base On Length Asc Order
-                result = await fiterByLengthAscOrder(result);
+                break;
+            default: //Do nothing
+                // result = await fiterByLengthAscOrder(result)
+                break;
 
         }
     }
