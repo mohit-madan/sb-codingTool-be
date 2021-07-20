@@ -279,8 +279,7 @@ module.exports = {
 
     downloadProjectQuestion: async (req,res) => {
         try{
-            const {projectId,questionIds} = req.body;
-            
+            const {projectId,questionIds} = req.query;
             const out = await projectDownload.saveFormResponsesToExcel(projectId,questionIds);
 
             await res.setHeader(
