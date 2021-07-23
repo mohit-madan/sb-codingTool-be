@@ -229,6 +229,7 @@ const applyFilter = async (result, operators, data) => {
                 break;
             case 10:
                 result = await filterByResponseOnCodewordGroupMatch(operators[i].codewordGroup,result);
+                break;
             case 11:
                 result = await filterByFilterColumnResponsePatternMatch(operators[i].pattern, operators[i].filter, result, data);
             case 12:

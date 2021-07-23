@@ -7,7 +7,7 @@ const {getResponse, operatorResponse} = require('../controller/response.controll
 const {userSearch, projectList} = require('../controller/dashBoard.controller');
 
 //upload project document file
-router.post('/downloadResponses', downloadProjectQuestion );
+router.get('/downloadResponses', downloadProjectQuestion );
 
 //upload project document file
 router.post('/uploadFile', authenticateUser, uploadFile );
