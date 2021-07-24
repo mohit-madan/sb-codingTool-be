@@ -301,8 +301,8 @@ module.exports = {
                                 logger.info("fetch data from cache");
                                 const response = await fetchQuestionsResponse(JSON.parse(data), questions);
                                 res.status(STATUS_CODE.Ok).send(
-                                    response.map(({ resNum, desc, length, codewords }) => {
-                                        return { resNum, desc, length, codewords };
+                                    response.map(({ resNum, desc, length, codewords,questionId }) => {
+                                        return { resNum, desc, length, codewords,questionId };
                                     })
                                 );
                             } else {
@@ -314,8 +314,8 @@ module.exports = {
                                 client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
                                 const response = await fetchQuestionsResponse(data, questions);
                                 res.status(STATUS_CODE.Ok).send(
-                                    response.map(({ resNum, desc, length, codewords }) => {
-                                        return { resNum, desc, length, codewords };
+                                    response.map(({ resNum, desc, length, codewords,questionId }) => {
+                                        return { resNum, desc, length, codewords,questionId };
                                     })
                                 );
                             }
@@ -331,8 +331,8 @@ module.exports = {
                     const response = await fetchQuestionsResponse(data, questions);
                     // console.log({response});
                     res.status(STATUS_CODE.Ok).send(
-                        response.map(({ resNum, desc, length, codewords }) => {
-                            return { resNum, desc, length, codewords };
+                        response.map(({ resNum, desc, length, codewords,questionId }) => {
+                            return { resNum, desc, length, codewords,questionId };
                         })
                     );
                 }
@@ -354,7 +354,7 @@ module.exports = {
                             if (status === 'false') {
                                 logger.info("fetch data from cache");
                                 const response = await fetchQuestionsResponse(JSON.parse(data), questions);
-                                result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
+                                result = response.map(({ resNum, desc, length, codewords,questionId }) => ({ resNum, desc, length, codewords,questionId }));
                                 const totalRes = result.length;
                                 const filter = applyFilter(result, operators, data);
                                 filter.then((filtered) => {
@@ -372,7 +372,7 @@ module.exports = {
                                 const data = await fetchProjectDataFromDatabase(projectId);
                                 client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
                                 const response = await fetchQuestionsResponse(data, questions);
-                                result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
+                                result = response.map(({ resNum, desc, length, codewords,questionId }) => ({ resNum, desc, length, codewords,questionId }));
                                 const totalRes = result.length;
                                 const filter = applyFilter(result, operators, data);
                                 filter.then((filtered) => {
@@ -395,7 +395,7 @@ module.exports = {
                     const data = await fetchProjectDataFromDatabase(projectId);
                     client.setex(`${projectId}`, cacheTimeFullProject, JSON.stringify(data));
                     const response = await fetchQuestionsResponse(data, questions);
-                    result = response.map(({ resNum, desc, length, codewords }) => ({ resNum, desc, length, codewords }));
+                    result = response.map(({ resNum, desc, length, codewords,questionId }) => ({ resNum, desc, length, codewords,questionId }));
                     const totalRes = result.length;
                     const filter = applyFilter(result, operators, data);
                     filter.then((filtered) => {

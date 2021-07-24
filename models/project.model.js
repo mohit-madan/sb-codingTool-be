@@ -12,6 +12,7 @@ const projectSchema = new mongoose.Schema({
     tags:[String],
     docKey:  { type: String, trim: true , required: true, unique: true},
     listOfQuestion:[{type: mongoose.Schema.Types.ObjectId, ref: 'Question'}],
+    groupOfQuestion:[Number],
     CreationDate: {type:Date, default: Date.now},
     endDate:Date,
     CreatedBy:{type: mongoose.Schema.Types.ObjectId, ref: 'User'},

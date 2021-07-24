@@ -88,7 +88,7 @@ const saveResponse = async (data, columns, filterColumns, project) => {
             columns.map(async ele => {
                 const codebookId = await createCodebook();
                 const questionId = await createQuestion(ele.question, codebookId, constants.qType_Question);
-                Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
+                Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId , groupOfQuestion: ele.group } }, { upsert: true, new: true })
                     .exec((err, info) => {
                         if (err) console.log("Error during push question in project question list: ", err);
                     })
@@ -118,7 +118,7 @@ const saveResponse = async (data, columns, filterColumns, project) => {
             filterColumns.map(async ele => {
 
                 const questionId = await createQuestion(ele.question, null, constants.qType_Filter);
-                Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId } }, { upsert: true, new: true })
+                Project.findByIdAndUpdate(project._id, { $push: { listOfQuestion: questionId , groupOfQuestion: -1} }, { upsert: true, new: true })
                     .exec((err, info) => {
                         if (err) console.log("Error during push question in project question list: ", err);
                     })
@@ -345,9 +345,9 @@ module.exports = {
                         codewords = data.codebook.codewords;
                         tree = [...data.rootCodebook, ...data.root,]
                     }
-                    console.log("data.codebook-->",data.codebook);
+                    // console.log("data.codebook-->",data.codebook);
                     
-                    console.log({codewords})
+                    // console.log({codewords})
 
                     res.status(STATUS_CODE.Ok).send({ tree, questionCodebookId, codewords });
 
